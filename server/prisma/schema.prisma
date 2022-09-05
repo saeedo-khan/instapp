@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String     @id @default(uuid())
+  email          String     @unique
+  name           String     @unique
+  password       String?
+  token          String?
+  writtenPosts   Post[]     @relation("writtenPosts")
+  favouritePosts Post[]     @relation("FavouritePosts")
+  thumbUrl       String?
+  gender         Gender?
+  statusMessage  String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime?  @updatedAt
+  followers      Follower[] @relation(name: "UserFollower")
+  following      Follower[] @relation(name: "UserFollowing")
+}
+
+model Post {
+  id            String        @id @default(uuid())
+  caption       String?
+  images        String[]
+  likes         PostLike[]
+  published     Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime?     @updatedAt
+  author        User          @relation("writtenPosts", fields: [authorId], references: [id])
+  authorId      String
+  favouriteBy   User?         @relation("FavouritePosts", fields: [favouriteById], references: [id])
+  favouriteById String?
+  comments      PostComment[]
+  PostTag       PostTag?      @relation(fields: [postTagId], references: [id])
+  postTagId     String?
+}
+
+model PostTag {
+  id    String @id @default(uuid())
+  name  String @unique
+  posts Post[]
+}
+
+model PostComment {
+  id        Int       @id @default(autoincrement())
+  reply     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  Post      Post?     @relation(fields: [postId], references: [id])
+  postId    String?
+}
+
+model PostLike {
+  id     Int     @id @default(autoincrement())
+  Post   Post?   @relation(fields: [postId], references: [id])
+  postId String?
+}
+
+model Follower {
+  id         Int      @id @default(autoincrement())
+  users      User     @relation(name: "UserFollower", fields: [userId], references: [id])
+  userId     String
+  follower   User     @relation(name: "UserFollowing", fields: [followerId], references: [id])
+  followerId String
+  createdAt  DateTime @default(now())
+}
+
+enum Gender {
+  FEMALE
+  MALE
+}
