@@ -1,5 +1,5 @@
 export interface IPost {
-    id:            number;
+    id:            string;
     caption:       null | string;
     images:        string[];
     published:     boolean;
@@ -10,4 +10,17 @@ export interface IPost {
     postTagId:     null;
     PostTag:       null;
     comments:      any[];
+    author:     IAuthor
+}
+
+export interface IAuthor {
+    id: string;
+    email: string;
+    name: string;
+    password: string;
+    token: string;
+    thumbUrl: string;
+    gender: string;
+    statusMessage: string;
+    isFollower: boolean;
 }

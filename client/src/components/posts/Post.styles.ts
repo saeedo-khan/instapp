@@ -5,7 +5,6 @@ import { Theme } from '@mui/material';
 const useStyles = makeStyles((theme: Theme) => 
 createStyles({
     wrap_post:{
-        boxShadow: 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px',
         marginTop: theme.spacing(5),
         marginBottom: theme.spacing(10),
     },
@@ -35,7 +34,7 @@ createStyles({
         },
         [theme.breakpoints.down('xs')]:{
             height: 300,
-            width: 300
+            width: '100vw'
         }
     },
     collapse:{
@@ -47,8 +46,11 @@ createStyles({
         },
         [theme.breakpoints.down('xs')]:{
             height: 300,
-            width: 300
+            width: '100vw'
         }
+    },
+    subColor:{
+        // color: 'rgba(255,255,255,0.5)',
     }
 })
 )

@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 export const getUsers = async (req:Request, res:Response) => {
     try {
         const users = await prisma.user.findMany({
-            include: { writtenPosts: true }
+            include: { writtenPosts: true, followers: true, following: true, likesPost: true }
         })
         res.json(users)
     } catch (error) {
@@ -19,7 +19,7 @@ export const getUser = async (req:Request, res:Response) => {
         const { id } = req.params
         const user = await prisma.user.findFirst({
             where: {name: id},
-            include: {writtenPosts: true}
+            include: { writtenPosts: true, followers: true, following: true, likesPost: true }
         })
         res.json(user)
     } catch (error) {
@@ -73,10 +73,47 @@ export const delateUser = async (req:Request, res:Response) => {
     try {
         const { id } = req.params;
         const user = await prisma.user.delete({
-            where: { id: id}
+            where: { id: id}            
         })
         res.json(user)
     } catch (error) {
         res.status(404).json({ message: error })
+    }
+}
+
+
+
+// followe a user
+
+export const addFollower = async (req:Request, res:Response) => {
+        const { userId, followerId } = req.body;
+
+        const checkFollow = await prisma.follower.findFirst({
+            where: { OR: [{userId, followerId}]}
+        })
+
+        if(checkFollow){
+            res.send('You already follow this user')
+        }else{
+            
+            await prisma.follower.create({
+                data: {userId, followerId}
+            })
+
+            res.send('Has been added successfully')
+        }
+
+}
+
+
+export const deleteFollower = async (req:Request, res:Response) => {
+    try {
+        const { id } = req.body;
+        const removeFollow = await prisma.follower.delete({
+            where: {id}
+        })
+        res.json(removeFollow)
+    } catch (error) {
+        res.status(404).json({ message: error})
     }
 }

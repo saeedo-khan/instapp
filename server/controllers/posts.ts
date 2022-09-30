@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { json } from "stream/consumers";
 const prisma = new PrismaClient()
 
 export const getPosts = async (req:Request, res:Response) => {
     try {
         const data = await prisma.post.findMany({
-            include: { PostTag: true, comments: true}
+            include: { PostTag: true, comments: true, author: true, likes: true}
         })
         res.json(data)
 
@@ -55,8 +56,35 @@ export const updatePost = async (req:Request, res:Response) => {
 export const deletePost = async (req:Request, res:Response) => {
     const { id } = req.params
     const post = await prisma.post.delete({
-        where: { id: id }
+        where: { id: id },
+        
     })
 
     res.json(post)
 }
+
+
+export const addLike = async (req:Request, res:Response) => {
+    const { postId, userId, isLiked } = req.body;
+    const checkLike = await prisma.postLike.findFirst({
+       where: { OR: [{postId, userId}]}
+    })
+
+    if(checkLike){        
+        res.status(404).send('you have already added');
+    }else{
+        await prisma.postLike.create({
+            data: { postId, userId, isLiked },
+        })
+        res.json('has been added successfully')
+    }
+}
+
+export const addComment = async (req:Request, res:Response) => {
+    const { postId, reply } = req.body;
+    const comment = await prisma.postComment.create({
+        data: { postId, reply }
+    })
+    res.status(200).json(comment)
+}
+

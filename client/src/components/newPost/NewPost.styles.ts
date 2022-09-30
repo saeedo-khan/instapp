@@ -7,9 +7,9 @@ const useStyles = makeStyles((theme: Theme) =>
         newPost:{
             color: '#fff',
             zIndex: theme.zIndex.drawer + 1,
-            width:'600px',
-            height: '550px',
-            backgroundColor: 'rgba(255,255,255,1)',
+            width: 500,
+            paddingBottom: theme.spacing(2),
+            backgroundColor: '#181A1B',
             borderRadius: '10px',
             [theme.breakpoints.down('sm')]:{
                 width: '90%'
@@ -28,10 +28,9 @@ const useStyles = makeStyles((theme: Theme) =>
         text_nav_post:{
             flex: 1,
             textAlign: 'center',
-            
         },
         text_nav:{
-            color:'black', 
+            color:'rgba(255,255,255,0.8)', 
             fontWeight: 500,
             fontSize: 23,
             [theme.breakpoints.down('sm')]:{
@@ -40,7 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         btn_post:{
             display: 'block',
-            textTransform: 'capitalize'
+            textTransform: 'capitalize',
         },
         newpost_body:{
             display: 'flex',
@@ -55,22 +54,9 @@ const useStyles = makeStyles((theme: Theme) =>
             alignItems: 'center',
             justifyContent: 'center'
         },
-        image_preview:{
-            // 650px
-            width:'80%',
-            height:'auto',
-            border: '1px solid rgba(0,0,0,0.1)',
-            padding: '1rem',
-            textAlign: 'center',
-            marginBottom: '1rem',
-            overflowY: 'auto',
-            maxHeight: '600px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-        },
         file_input:{
             width: '100%',
+            color: 'rgba(255,255,255,0.7)',
             [theme.breakpoints.down('sm')]:{
                 width: '80%'
             }

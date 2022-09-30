@@ -25,6 +25,7 @@ model User {
   updatedAt      DateTime?  @updatedAt
   followers      Follower[] @relation(name: "UserFollower")
   following      Follower[] @relation(name: "UserFollowing")
+  likesPost      PostLike[]
 }
 
 model Post {
@@ -60,9 +61,12 @@ model PostComment {
 }
 
 model PostLike {
-  id     Int     @id @default(autoincrement())
-  Post   Post?   @relation(fields: [postId], references: [id])
-  postId String?
+  id      Int     @id @default(autoincrement())
+  Post    Post?   @relation(fields: [postId], references: [id])
+  postId  String?
+  User    User?   @relation(fields: [userId], references: [id])
+  userId  String?
+  isLiked Boolean @default(false)
 }
 
 model Follower {
@@ -72,6 +76,7 @@ model Follower {
   follower   User     @relation(name: "UserFollowing", fields: [followerId], references: [id])
   followerId String
   createdAt  DateTime @default(now())
+  isFollower Boolean  @default(false)
 }
 
 enum Gender {

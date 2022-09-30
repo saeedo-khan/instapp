@@ -117,8 +117,8 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post, id, pathname }) => {
               />
             </Box>
             <Box>
-              <IconButton>
-                <ReplyIcon onClick={handleExpandClick} />
+              <IconButton onClick={handleExpandClick}>
+                <ReplyIcon />
               </IconButton>
             </Box>
           </Box>

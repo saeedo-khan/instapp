@@ -4,7 +4,7 @@ import { Theme } from "@mui/material";
 const useStyles = makeStyles((theme: Theme) => 
     createStyles({
       nav_appbar:{
-        backgroundColor: 'rgba(var(--d87,255,255,255),1)',
+        backgroundColor: '#181A1B',
         height: 70,
         justifyContent: 'center'
       },
@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
         objectFit: 'cover'
       },
       inputSearch:{
-        background:'rgba(var(--bb2,239,239,239),1)',
+        background:'white',
         padding: '0 3px',
         width: '100%',
         height: '100%'

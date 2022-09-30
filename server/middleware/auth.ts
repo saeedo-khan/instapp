@@ -17,26 +17,30 @@ export interface CustomRequest extends Request {
 token: string | JwtPayload;
 }
 
-const verifyToken = async (req:Request, res:Response, next:NextFunction) => {
-    
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
+export interface User extends CustomRequest {
+    user: any;
+    id: string;
+    name: string;
+}
 
+
+const verifyToken = async (req:Request, res:Response, next:NextFunction) => {
+
+    const token = req.body.token || req.query.token || req.headers["x-access-token"];
     if(!token){
         return res.status(403).json({ message: "Authorization denied, Please login"})
     }
 
-    try {
+    try {        
+        const decoded = <any>jwt.verify(token, process.env.TOKEN_KEY);
+        // (req as CustomRequest).token = data;
+        (req as User).user = decoded
         
-        const decode = jwt.verify(token, process.env.TOKEN_KEY);
-        (req as CustomRequest).token = decode;
-
-        
+        next()        
     } catch (error) {
-        res.status(401).json({ message: "Please authenticate"})
+        res.clearCookie("access_token")
+        return res.status(400).json({ message: "Please authenticate"})
     }
-
-    next()
 }
 
 export default verifyToken

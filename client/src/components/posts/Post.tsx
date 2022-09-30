@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Avatar,
   Box,
@@ -14,12 +14,9 @@ import {
   IconButtonProps,
   styled,
   Checkbox,
-  CardMedia,
 } from "@mui/material";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
 import Favorite from "@mui/icons-material/Favorite";
-import MessageIcon from "@mui/icons-material/Message";
-import ShareIcon from "@mui/icons-material/Share";
 import CommentIcon from "@mui/icons-material/Comment";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ReplyIcon from "@mui/icons-material/Reply";
@@ -28,10 +25,12 @@ import Image from "next/image";
 import useStyles from "./Post.styles";
 import { IPost } from "../../interfaces/types";
 
-import usePost from "../../context/post/PostContext";
 import { red } from "@mui/material/colors";
 import { Divider } from "@material-ui/core";
 import { convertDate } from "../../../utils/convertDate";
+import Link from "next/link";
+import usePost from "../../context/post/PostContext";
+import { useSessionStorage } from "../../hooks/useSessionStorage";
 
 interface PostProps {
   post: IPost;
@@ -57,32 +56,60 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-const Post: React.FC<PostProps> = ({ post, idx }) => {
+const Post: React.FC<PostProps> = ({ post }) => {
   const classes = useStyles(useStyles);
 
-  const { removePost } = usePost();
-
+  const { likePost, addComment } = usePost();
   const [expandComment, setExpandComment] = useState<boolean>(false);
-
   const [expanded, setExpanded] = React.useState(false);
+  const [checkedIcon, setChecked] = useState<boolean>(false);
+  const [comment, setComment] = useState<string>("");
+
+  const [userData, setUserData] = useSessionStorage("userData", "");
+
+  useEffect(() => {
+    if (checkedIcon) {
+      likePost(post.id);
+    }
+  }, [checkedIcon]);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
+  const handleSubmit = () => {
+    addComment(post.id, comment);
+    setComment("");
+  };
+
+  console.log(post.author.isFollower);
+
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
   return (
     <Box className={classes.wrap_post}>
-      <Card sx={{ maxWidth: 700 }}>
+      <Card
+        sx={{
+          maxWidth: 700,
+        }}
+      >
         <CardHeader
           avatar={
-            <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-              R
-            </Avatar>
+            <Link href={`/user/${post.author.name}`}>
+              <Avatar
+                sx={{ bgcolor: red[500], cursor: "pointer" }}
+                aria-label="recipe"
+              >
+                {post.author.name.charAt(0)}
+              </Avatar>
+            </Link>
           }
-          title="Mohammed Khalid"
-          subheader={`${convertDate(post.createdAt)}`}
+          title={post.author.name}
+          subheader={
+            <Typography className={classes.subColor}>
+              {convertDate(post.createdAt)}
+            </Typography>
+          }
         />
         <Box className={classes.image_wrap}>
           <Image
@@ -92,9 +119,7 @@ const Post: React.FC<PostProps> = ({ post, idx }) => {
           />
         </Box>
         <CardContent>
-          <Typography variant="h6" color="black">
-            {post.caption}
-          </Typography>
+          <Typography variant="h6">{post.caption}</Typography>
         </CardContent>
 
         <CardActions disableSpacing>
@@ -102,6 +127,7 @@ const Post: React.FC<PostProps> = ({ post, idx }) => {
             {...label}
             icon={<FavoriteBorder />}
             checkedIcon={<Favorite sx={{ color: red[400] }} />}
+            onChange={() => setChecked(!checkedIcon)}
           />
           <IconButton
             aria-label="add to favorites"
@@ -128,35 +154,42 @@ const Post: React.FC<PostProps> = ({ post, idx }) => {
           className={classes.collapse}
         >
           <Divider />
-          <Stack direction="column" justifyContent={"center"} paddingY={2}>
-            <Box display={"flex"} alignItems={"center"}>
-              <Box
-                component={"span"}
-                paddingY={1}
-                pl={1}
-                display="flex"
-                alignItems="center"
-                flexBasis={"50%"}
-              >
-                <Avatar sx={{ width: 24, height: 24 }}>R</Avatar>
-                <Typography ml={1} fontSize={14}>
-                  isaeedx
+
+          {post.comments.map((comment) => (
+            <Stack
+              direction="column"
+              justifyContent={"center"}
+              paddingY={2}
+              key={comment.id}
+            >
+              <Box display={"flex"} alignItems={"center"}>
+                <Box
+                  component={"span"}
+                  paddingY={1}
+                  pl={1}
+                  display="flex"
+                  alignItems="center"
+                  flexBasis={"50%"}
+                >
+                  <Avatar sx={{ width: 24, height: 24 }}>
+                    {userData.name?.charAt(0)}
+                  </Avatar>
+                  <Typography ml={1} fontSize={14}>
+                    {userData.name}
+                  </Typography>
+                </Box>
+                <Box flexBasis={"45%"} display="flex" justifyContent="flex-end">
+                  {/* color="rgba(255,255,255,0.8)" */}
+                  <Typography>{convertDate(post.createdAt)}</Typography>
+                </Box>
+              </Box>
+              <Box maxWidth={"95%"}>
+                <Typography ml={5} fontSize={14}>
+                  {comment.reply}
                 </Typography>
               </Box>
-              <Box flexBasis={"45%"} display="flex" justifyContent="flex-end">
-                <Typography color="rgba(0,0,0,0.5)">1 days ago</Typography>
-              </Box>
-            </Box>
-            <Box maxWidth={"95%"}>
-              <Typography ml={5} color={"rgba(0,0,0,0.7)"} fontSize={14}>
-                I like how ur image looks like I like how ur image looks like I
-                like how ur image looks like I like how ur image looks like I
-                like how ur image looks like I like how ur image looks like I
-                like how ur image looks like I like how ur image looks like I
-                like how ur image looks like I like how ur image looks like
-              </Typography>
-            </Box>
-          </Stack>
+            </Stack>
+          ))}
 
           <Divider />
         </Collapse>
@@ -172,10 +205,12 @@ const Post: React.FC<PostProps> = ({ post, idx }) => {
                 name="comment"
                 placeholder="Write comment .."
                 fullWidth
+                onChange={(e) => setComment(e.target.value)}
+                value={comment}
               />
             </Box>
             <Box>
-              <IconButton>
+              <IconButton onClick={handleSubmit}>
                 <ReplyIcon />
               </IconButton>
             </Box>

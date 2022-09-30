@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import {
   Box,
@@ -8,16 +8,15 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
-import { Theme, IconButton, useMediaQuery } from "@mui/material";
-import { useRouter } from "next/router";
+import { Theme, IconButton } from "@mui/material";
 import { RiSettings3Line } from "react-icons/ri";
-import Modal from "react-modal";
 
 import image1 from "../../assets/6f03eb85463c.jpg";
 import axios from "axios";
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
-import Link from "next/link";
-import ProfilePost from "../../components/profilePost/ProfilePost";
+import MiniProfileImage from "../../components/miniProfileImage/MiniProfileImage";
+import useUsers from "../../context/users/UsersContext";
+import { useSessionStorage } from "../../hooks/useSessionStorage";
 
 interface profileProps {}
 
@@ -35,6 +34,10 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(4),
       maxWidth: "60%",
       margin: "0 auto",
+      [theme.breakpoints.down("sm")]: {
+        maxWidth: "100%",
+        alignItems: "center",
+      },
     },
     top_profile: {
       width: "100%",
@@ -43,6 +46,9 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: "space-around",
       marginBottom: theme.spacing(2),
       marginTop: theme.spacing(1),
+      [theme.breakpoints.down("sm")]: {
+        width: "90%",
+      },
     },
     profile_img_wrap: {
       width: 200,
@@ -65,6 +71,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: theme.spacing(1),
       fontSize: 25,
       fontFamily: "Roboto",
+      // color: "rgba(255,255,255,0.7)",
       [theme.breakpoints.down("xs")]: {
         fontSize: 20,
       },
@@ -79,6 +86,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: 14,
       textTransform: "capitalize",
       fontFamily: "Roboto, sans-serif",
+      color: "white",
       [theme.breakpoints.down("xs")]: {
         width: 140,
       },
@@ -100,7 +108,6 @@ const useStyles = makeStyles((theme: Theme) =>
     line: {
       width: "100%",
       height: 1,
-      backgroundColor: "rgba(1,1,1,0.2)",
       display: "block",
     },
     stats: {
@@ -120,7 +127,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "inline-block",
     },
     stats_text: {
-      color: "rgba(1,1,1,0.7)",
+      // color: "rgba(255,255,255,0.7)",
       fontSize: 14,
       marginTop: theme.spacing(1),
     },
@@ -135,44 +142,11 @@ const useStyles = makeStyles((theme: Theme) =>
         maxWidth: "780px",
       },
     },
-    post_content: {
-      position: "relative",
-      width: 300,
-      height: 300,
-      margin: "0 auto",
-      cursor: "pointer",
-      zIndex: 1,
-      marginBottom: theme.spacing(1),
-      [theme.breakpoints.down("sm")]: {
-        width: 240,
-        height: 240,
-      },
-      [theme.breakpoints.down("xs")]: {
-        width: "31vw",
-        height: "31vw",
-      },
-    },
-    overlayEffect: {
-      zIndex: 10,
-      position: "relative",
-      display: "block",
-      width: "100%",
-      height: "100%",
-      transition: theme.transitions.create(["background-color"]),
-      "&:hover": {
-        width: "100%",
-        height: "100%",
-        backgroundColor: "rgba(1,1,1,0.3)",
-        zIndex: 100,
-      },
-    },
   })
 );
 
-Modal.setAppElement("#__next");
-
 export const getStaticPaths: GetStaticPaths = async () => {
-  const res = await axios("http://localhost:3000/users");
+  const res = await axios.get("http://localhost:3000/users");
 
   const paths = res.data.map((user: any) => {
     return {
@@ -202,16 +176,15 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 const Profile: React.FC<profileProps> = ({
   instaUser,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const isMid = useMediaQuery("sm");
-  const router = useRouter();
-
   const classes = useStyles();
 
-  const [open, setOpen] = useState<boolean>(false);
+  const { followUser } = useUsers();
 
-  const handleClose = () => {
-    setOpen(!open);
-    router.push(`/user/${instaUser.name}`);
+  const [userData, setUserData] = useSessionStorage("userData", "");
+
+  const handleFollow = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    followUser(instaUser.id);
   };
 
   return (
@@ -228,8 +201,8 @@ const Profile: React.FC<profileProps> = ({
             />
           </Box>
 
-          <Box display="flex" flexDirection="column">
-            <Box display="flex">
+          <Box display="flex">
+            <Box display="flex" alignItems="center" justifyContent="center">
               <Typography className={classes.profile_username}>
                 {instaUser.name}
               </Typography>
@@ -238,14 +211,17 @@ const Profile: React.FC<profileProps> = ({
               </IconButton>
             </Box>
 
-            <Box flex={1}>
-              <Button
-                variant="contained"
-                className={classes.edit_btn}
-                fullWidth
-              >
-                Edit Profile
-              </Button>
+            <Box>
+              {userData.name !== instaUser.name && (
+                <Button
+                  variant="contained"
+                  className={classes.edit_btn}
+                  fullWidth
+                  onClick={handleFollow}
+                >
+                  Follow
+                </Button>
+              )}
             </Box>
           </Box>
         </Box>
@@ -264,19 +240,19 @@ const Profile: React.FC<profileProps> = ({
         <Grid container className={classes.stats_profile}>
           <Grid item xs={4}>
             <Box className={classes.count_stats}>
-              {instaUser.writtenPosts.length}
+              {instaUser.writtenPosts ? instaUser.writtenPosts.length : "0"}
             </Box>
             <Typography className={classes.stats_text}>post</Typography>
           </Grid>
           <Grid item xs={4}>
             <Box className={classes.wrap_stats}>
-              <Box className={classes.stats}>89</Box>
+              <Box className={classes.stats}>{instaUser.followers.length}</Box>
               <Typography className={classes.stats_text}>followers</Typography>
             </Box>
           </Grid>
           <Grid item xs={4}>
             <Box className={classes.wrap_stats}>
-              <Box className={classes.stats}>159</Box>
+              <Box className={classes.stats}>{instaUser.following.length}</Box>
               <Typography className={classes.stats_text}>follwing</Typography>
             </Box>
           </Grid>
@@ -288,34 +264,23 @@ const Profile: React.FC<profileProps> = ({
       {/* posts */}
       <Box className={classes.posts_contain}>
         <Grid container>
-          {instaUser.writtenPosts.map((post: any) => (
-            <Link href={`/p/[postId]?postId=${post.id}`} as={`/p/${post.id}`}>
-              <Grid item xs={4}>
-                <Box className={classes.post_content}>
-                  <Box className={classes.overlayEffect}></Box>
-                  <Image
-                    src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post.images[0]}`}
-                    alt={post.caption}
-                    layout="fill"
-                    objectFit="cover"
-                  />
-                </Box>
-              </Grid>
-            </Link>
-          ))}
+          {instaUser.writtenPosts ? (
+            instaUser.writtenPosts.map((post: any) => (
+              <MiniProfileImage post={post} key={post.id} />
+            ))
+          ) : (
+            <p
+              style={{
+                textAlign: "center",
+                width: "100%",
+                marginTop: "1.5rem",
+              }}
+            >
+              No post Added yet
+            </p>
+          )}
         </Grid>
       </Box>
-
-      <Modal
-        isOpen={!!router.query.postId}
-        onRequestClose={() => router.push("/")}
-      >
-        <ProfilePost
-          id={router.query.postId}
-          post={undefined}
-          pathname={router.pathname}
-        />
-      </Modal>
     </Box>
   );
 };
