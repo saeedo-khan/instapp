@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient()
+const cloudinary = require('cloudinary').v2;
 
 
 export const getUsers = async (req:Request, res:Response) => {
@@ -86,34 +87,54 @@ export const delateUser = async (req:Request, res:Response) => {
 // followe a user
 
 export const addFollower = async (req:Request, res:Response) => {
-        const { userId, followerId } = req.body;
-
-        const checkFollow = await prisma.follower.findFirst({
-            where: { OR: [{userId, followerId}]}
+    const { userId, followerId, isFollower } = req.body;
+    console.log(req.body)
+    try {
+        const followUser = await prisma.follower.create({
+            data: {
+                userId,
+                followerId,
+                isFollower
+            }
         })
-
-        if(checkFollow){
-            res.send('You already follow this user')
-        }else{
-            
-            await prisma.follower.create({
-                data: {userId, followerId}
-            })
-
-            res.send('Has been added successfully')
-        }
-
+    
+        res.status(200).json(followUser)
+    } catch (error) {
+        res.status(404).json({ error: error })
+    }
+        
+    
 }
 
 
 export const deleteFollower = async (req:Request, res:Response) => {
     try {
-        const { id } = req.body;
+        const { id } = req.params;
         const removeFollow = await prisma.follower.delete({
-            where: {id}
+            where: {id: Number(id)},
         })
         res.json(removeFollow)
     } catch (error) {
         res.status(404).json({ message: error})
     }
 }
+
+
+// update thumb 
+
+export const deleteThumb = async (req:Request, res:Response) => {
+    const { id } = req.params
+    const { thumbUrl } = req.body;
+    try {
+        await prisma.user.update({
+            where: { id: id},
+            data: { thumbUrl }
+        });
+        cloudinary.uploader.destroy(thumbUrl)
+        
+        res.status(200).send(thumbUrl)
+    } catch (error) {
+        res.status(400).json({ error: error })
+    }
+}
+

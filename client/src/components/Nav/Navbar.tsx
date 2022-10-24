@@ -23,8 +23,8 @@ import Image from "next/image";
 import { AccountCircle } from "@mui/icons-material";
 import Link from "next/link";
 import useAuth from "../../context/auth/AuthContext";
-import axios from "axios";
 import { useRouter } from "next/router";
+import { useSessionStorage } from "../../hooks/useSessionStorage";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -75,7 +75,7 @@ const Navbar = () => {
 
   const router = useRouter();
 
-  const data = JSON.parse(`${sessionStorage.getItem("userData")}`);
+  const [user] = useSessionStorage("userData", "");
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -95,6 +95,7 @@ const Navbar = () => {
   const classes = useStyles(useStyles);
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
+
   return (
     <>
       <Modal
@@ -173,12 +174,27 @@ const Navbar = () => {
                 <MenuItem
                   onClick={() => {
                     handleClose();
-                    router.replace(`/user/${data.name}`);
+                    router.replace(`/user/${user.name}`);
                   }}
                 >
                   Profile
                 </MenuItem>
-                <MenuItem onClick={handleClose}>Settings</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleClose();
+                    router.replace(`/user/${user.name}/settings`);
+                  }}
+                >
+                  Settings
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleClose();
+                    router.replace(`/suggest_users`);
+                  }}
+                >
+                  Add Friends
+                </MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </Box>

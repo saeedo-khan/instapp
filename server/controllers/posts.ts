@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { json } from "stream/consumers";
 const prisma = new PrismaClient()
 
 export const getPosts = async (req:Request, res:Response) => {
@@ -54,29 +53,40 @@ export const updatePost = async (req:Request, res:Response) => {
 
 
 export const deletePost = async (req:Request, res:Response) => {
-    const { id } = req.params
-    const post = await prisma.post.delete({
-        where: { id: id },
-        
-    })
-
-    res.json(post)
+    try {
+        const { id } = req.params
+        const post = await prisma.post.delete({
+            where: { id: id },  
+        })
+        res.json(post)
+    } catch (error) {
+        res.json(error)
+    }
+    
 }
 
 
 export const addLike = async (req:Request, res:Response) => {
     const { postId, userId, isLiked } = req.body;
-    const checkLike = await prisma.postLike.findFirst({
-       where: { OR: [{postId, userId}]}
-    })
+    // const checkLike = await prisma.postLike.findFirst({
+    //    where: { OR: [{postId, userId}]}
+    // })
 
-    if(checkLike){        
-        res.status(404).send('you have already added');
-    }else{
-        await prisma.postLike.create({
-            data: { postId, userId, isLiked },
+    await prisma.postLike.create({
+        data: { postId, userId, isLiked },
+    })
+    res.json('has been added successfully')
+}
+
+export const dislike = async (req:Request, res:Response) => {
+    try {
+        const { id } = req.params;
+        const deleteLike = await prisma.postLike.delete({
+            where: { id: Number(id) }
         })
-        res.json('has been added successfully')
+        res.json(deleteLike)
+    } catch (error) {
+        res.status(404).json({ message: error})
     }
 }
 

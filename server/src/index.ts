@@ -8,6 +8,10 @@ import cookieParser from 'cookie-parser'
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 const cloudinary = require('cloudinary').v2;
 
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient()
+
+
 // routes
 import postRoutes from '../routes/posts'
 import userRoutes from '../routes/users'
@@ -69,8 +73,8 @@ const uploadFiels = async (req:Request, res:Response) => {
     res.json({ file: req.file?.filename})
 }
 
-
-app.post('/upload_files', upload.single('post'), uploadFiels)
+app.post('/upload_files', upload.single("post"), uploadFiels)
+app.post('/upload_thumb', upload.single("thumb"), uploadFiels)
 
 
 

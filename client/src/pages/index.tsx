@@ -29,7 +29,6 @@ const Home: NextPage = (
         withCredentials: true,
         headers: { "x-access-token": `${localStorage.getItem("token")}` },
       })
-      .then((response) => console.log(response))
       .catch((err) => {
         localStorage.removeItem("token");
         router.reload();

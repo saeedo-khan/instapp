@@ -20,7 +20,7 @@ const lightTheme = createTheme({
 
 const PageProvider = ({ children }: PageProviderProps) => {
   const { resolvedTheme } = useTheme();
-  const [currentTheme, setCurrentTheme] = useState(darkTheme);
+  const [currentTheme, setCurrentTheme] = useState(lightTheme);
 
   useEffect(() => {
     resolvedTheme === "light"

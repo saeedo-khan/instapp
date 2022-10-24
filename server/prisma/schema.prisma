@@ -10,22 +10,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// statusMessage
 model User {
-  id             String     @id @default(uuid())
-  email          String     @unique
-  name           String     @unique
-  password       String?
-  token          String?
-  writtenPosts   Post[]     @relation("writtenPosts")
-  favouritePosts Post[]     @relation("FavouritePosts")
-  thumbUrl       String?
-  gender         Gender?
-  statusMessage  String?
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime?  @updatedAt
-  followers      Follower[] @relation(name: "UserFollower")
-  following      Follower[] @relation(name: "UserFollowing")
-  likesPost      PostLike[]
+  id              String     @id @default(uuid())
+  email           String     @unique
+  name            String     @unique
+  password        String?
+  token           String?
+  writtenPosts    Post[]     @relation("writtenPosts")
+  favouritePosts  Post[]     @relation("FavouritePosts")
+  profile_pic_url String?
+  gender          Gender?
+  biography       String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime?  @updatedAt
+  followers       Follower[] @relation(name: "UserFollower")
+  following       Follower[] @relation(name: "UserFollowing")
+  likesPost       PostLike[]
 }
 
 model Post {
@@ -71,9 +72,9 @@ model PostLike {
 
 model Follower {
   id         Int      @id @default(autoincrement())
-  users      User     @relation(name: "UserFollower", fields: [userId], references: [id])
+  user       User     @relation(name: "UserFollowing", fields: [userId], references: [id])
   userId     String
-  follower   User     @relation(name: "UserFollowing", fields: [followerId], references: [id])
+  follower   User     @relation(name: "UserFollower", fields: [followerId], references: [id])
   followerId String
   createdAt  DateTime @default(now())
   isFollower Boolean  @default(false)

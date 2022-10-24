@@ -18,7 +18,8 @@ export interface PostContext {
   addPost: (caption: String, images: String) => void;
   removePost: (id: String) => void;
   likePost: (postId: String) => void;
-  followUser: (followerId: string, userId: string) => void;
+  dislike: (likeId: number) => void;
+  // followUser: (followerId: string, userId: string) => void;
   addComment: (postId: String, reply: String) => void;
 }
 
@@ -27,7 +28,7 @@ const PostContext = createContext({} as PostContext);
 export const PostContextProvider: React.FC<PostContextProps> = ({
   children,
 }) => {
-  const [userData, setUserData] = useSessionStorage("userData", "");
+  const [userData] = useSessionStorage("userData", "");
 
   const router = useRouter();
 
@@ -51,19 +52,12 @@ export const PostContextProvider: React.FC<PostContextProps> = ({
   };
 
   const removePost = (id: String) => {
-    axios.delete(`http://localhost:3000/posts/${id}`).then((res) => {
-      router.push("/");
-    });
-  };
-
-  const followUser = (followerId: string) => {
-    const follow = {
-      userId: userData.id,
-      followerId,
-    };
-    axios.post(`http://localhost:3000/users/follow`, follow).then((res) => {
-      console.log(res.data);
-    });
+    axios
+      .delete(`http://localhost:3000/posts/${id}`)
+      .then((res) => {
+        router.push(`/user/${userData.name}`);
+      })
+      .catch((err) => console.log(err));
   };
 
   const likePost = (postId: String) => {
@@ -76,8 +70,16 @@ export const PostContextProvider: React.FC<PostContextProps> = ({
       toast.success(`Like post  successfully`, {
         position: "top-center",
       });
-      console.log(res.data);
     });
+  };
+
+  const dislike = (likeId: number) => {
+    axios
+      .delete(`http://localhost:3000/posts/like/${likeId}`)
+      .then((res) => {})
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const addComment = (postId: String, reply: String) => {
@@ -102,7 +104,7 @@ export const PostContextProvider: React.FC<PostContextProps> = ({
 
   return (
     <PostContext.Provider
-      value={{ addPost, removePost, likePost, followUser, addComment }}
+      value={{ addPost, removePost, likePost, dislike, addComment }}
     >
       {children}
     </PostContext.Provider>

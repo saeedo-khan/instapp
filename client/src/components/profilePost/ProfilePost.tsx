@@ -2,22 +2,25 @@ import React, { useState } from "react";
 import {
   Avatar,
   Box,
+  Button,
   Checkbox,
   IconButton,
   Stack,
   TextField,
   Theme,
+  Typography,
 } from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
 import { red } from "@mui/material/colors";
-
+import Modal from "@mui/material/Modal";
 // icons
 import Favorite from "@mui/icons-material/Favorite";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
 import CommentIcon from "@mui/icons-material/Comment";
 import ReplyIcon from "@mui/icons-material/Reply";
 import { createStyles, makeStyles } from "@material-ui/core";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface ProfilePostProps {
   post: any;
@@ -57,6 +60,20 @@ const useStyles = makeStyles((theme: Theme) =>
         height: "100vw",
       },
     },
+    modalContainer: {
+      position: "absolute",
+      left: "50%",
+      top: "50%",
+      transform: "translate(-50%, -50%)",
+    },
+    wrapRemovePost: {
+      textAlign: "center",
+      backgroundColor: "rgba(18,18,18,.9)",
+      padding: theme.spacing(5),
+      borderRadius: 5,
+      display: "block",
+      width: "100%",
+    },
   })
 );
 
@@ -71,60 +88,89 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post, id, pathname }) => {
     setExpandComment(!expandComment);
   };
 
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   return (
-    <Box className={classes.profilePost}>
-      <Box className={classes.container}>
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Box ml={1}>
-            <Link href={`/user/${post.author.name}`} passHref>
-              <Avatar sx={{ cursor: "pointer" }}>S</Avatar>
-            </Link>
+    <>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className={classes.modalContainer}>
+          <Box className={classes.wrapRemovePost}>
+            <Typography mb={2}>Are you want remove post ?</Typography>
+            <Button variant="contained" color="warning" onClick={handleClose}>
+              Delete
+            </Button>
           </Box>
-          <Box>
-            <Link href={`/user/${post.author.name}`} passHref>
-              {post.author.name}
-            </Link>
-          </Box>
-        </Stack>
-        <Box className={classes.imgWrap}>
-          <Image
-            src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post.images[0]}`}
-            alt={post.caption}
-            layout="fill"
-            objectFit="cover"
-          />
         </Box>
+      </Modal>
 
-        <Stack direction="row" spacing={1}>
-          <Checkbox
-            {...label}
-            icon={<FavoriteBorder />}
-            checkedIcon={<Favorite sx={{ color: red[400] }} />}
-          />
-          <IconButton aria-label="add to favorites" onClick={handleExpandClick}>
-            <CommentIcon />
-          </IconButton>
-        </Stack>
-
-        {expandComment && (
-          <Box display="flex" width="100%">
-            <Box flex={2} alignItems="center" display="flex">
-              <TextField
-                variant="standard"
-                type="text"
-                placeholder="Write comment..."
-                fullWidth
-              />
+      <Box className={classes.profilePost}>
+        <Box className={classes.container}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Box ml={1}>
+              <Link href={`/user/${post.author.name}`} passHref>
+                <Avatar sx={{ cursor: "pointer" }}>S</Avatar>
+              </Link>
             </Box>
             <Box>
-              <IconButton onClick={handleExpandClick}>
-                <ReplyIcon />
-              </IconButton>
+              <Link href={`/user/${post.author.name}`} passHref>
+                {post.author.name}
+              </Link>
             </Box>
+          </Stack>
+          <Box className={classes.imgWrap}>
+            <Image
+              src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post.images[0]}`}
+              alt={post.caption}
+              layout="fill"
+              objectFit="cover"
+            />
           </Box>
-        )}
+
+          <Stack direction="row" spacing={1}>
+            <Checkbox
+              {...label}
+              icon={<FavoriteBorder />}
+              checkedIcon={<Favorite sx={{ color: red[400] }} />}
+            />
+            <IconButton
+              aria-label="add to favorites"
+              onClick={handleExpandClick}
+            >
+              <CommentIcon />
+            </IconButton>
+
+            <IconButton aria-label="remove post" onClick={handleOpen}>
+              <DeleteIcon />
+            </IconButton>
+          </Stack>
+
+          {expandComment && (
+            <Box display="flex" width="100%">
+              <Box flex={2} alignItems="center" display="flex">
+                <TextField
+                  variant="standard"
+                  type="text"
+                  placeholder="Write comment..."
+                  fullWidth
+                />
+              </Box>
+              <Box>
+                <IconButton onClick={handleExpandClick}>
+                  <ReplyIcon />
+                </IconButton>
+              </Box>
+            </Box>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

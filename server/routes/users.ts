@@ -1,5 +1,5 @@
 import express from 'express'
-import { createUser, delateUser, getUser, getUsers, updateUser, addFollower, deleteFollower } from '../controllers/users'
+import { createUser, delateUser, getUser, getUsers, updateUser, addFollower, deleteFollower, deleteThumb } from '../controllers/users'
 import verifyToken from '../middleware/auth'
 
 
@@ -9,8 +9,9 @@ router.get('/',  getUsers)
 router.get('/:id', getUser)
 router.post('/', createUser)
 router.put('/:id', updateUser)
+router.put('/:id', deleteThumb)
 router.delete('/:id',  delateUser)
 router.post('/follow',  addFollower)
-router.post('/unfollow',  deleteFollower)
+router.delete('/follow/:id',  deleteFollower)
 
 export default router

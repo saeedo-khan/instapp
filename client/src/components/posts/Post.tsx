@@ -31,6 +31,7 @@ import { convertDate } from "../../../utils/convertDate";
 import Link from "next/link";
 import usePost from "../../context/post/PostContext";
 import { useSessionStorage } from "../../hooks/useSessionStorage";
+import { Toaster } from "react-hot-toast";
 
 interface PostProps {
   post: IPost;
@@ -59,19 +60,23 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 const Post: React.FC<PostProps> = ({ post }) => {
   const classes = useStyles(useStyles);
 
-  const { likePost, addComment } = usePost();
+  const { likePost, dislike, addComment } = usePost();
   const [expandComment, setExpandComment] = useState<boolean>(false);
   const [expanded, setExpanded] = React.useState(false);
-  const [checkedIcon, setChecked] = useState<boolean>(false);
   const [comment, setComment] = useState<string>("");
+  const [likedPost, setLikedPost] = React.useState(false);
 
-  const [userData, setUserData] = useSessionStorage("userData", "");
+  const [userData] = useSessionStorage("userData", "");
 
-  useEffect(() => {
-    if (checkedIcon) {
+  const handleLike = () => {
+    if (post.likes[0]?.isLiked) {
+      dislike(post.likes[0].id);
+      setLikedPost(false);
+    } else if (!post.likes[0]?.isLiked) {
       likePost(post.id);
+      setLikedPost(true);
     }
-  }, [checkedIcon]);
+  };
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -82,12 +87,19 @@ const Post: React.FC<PostProps> = ({ post }) => {
     setComment("");
   };
 
-  console.log(post.author.isFollower);
+  useEffect(() => {
+    if (post.likes[0]?.isLiked) {
+      setLikedPost(true);
+    } else {
+      setLikedPost(false);
+    }
+  }, []);
 
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
   return (
     <Box className={classes.wrap_post}>
+      <Toaster />
       <Card
         sx={{
           maxWidth: 700,
@@ -95,7 +107,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
       >
         <CardHeader
           avatar={
-            <Link href={`/user/${post.author.name}`}>
+            <Link href={`/user/${post.author.name}`} passHref>
               <Avatar
                 sx={{ bgcolor: red[500], cursor: "pointer" }}
                 aria-label="recipe"
@@ -127,8 +139,10 @@ const Post: React.FC<PostProps> = ({ post }) => {
             {...label}
             icon={<FavoriteBorder />}
             checkedIcon={<Favorite sx={{ color: red[400] }} />}
-            onChange={() => setChecked(!checkedIcon)}
+            onClick={handleLike}
+            checked={likedPost}
           />
+
           <IconButton
             aria-label="add to favorites"
             onClick={() => setExpandComment(!expandComment)}

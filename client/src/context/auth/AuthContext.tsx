@@ -29,20 +29,28 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
       password,
     };
 
-    axios
-      .post("http://localhost:3000/login", loginData, { withCredentials: true })
-      .then((res) => {
-        const { name, id, token } = res.data.existingUser;
-        const userData = {
-          id: id,
-          name: name,
-          email: email,
-        };
-        localStorage.setItem("token", token);
-        setUser(userData);
-        setLoading(false);
-        router.replace("/");
-      });
+    try {
+      axios
+        .post("http://localhost:3000/login", loginData, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          const { name, id, token, thumbUrl } = res.data.existingUser;
+          const userData = {
+            id: id,
+            name: name,
+            email: email,
+            thumbUrl: thumbUrl,
+          };
+          localStorage.setItem("token", token);
+          setUser(userData);
+          setLoading(false);
+          router.replace("/suggest_users");
+        });
+    } catch (err) {
+      setLoading(false);
+      console.log(err);
+    }
   };
 
   const signUp = (name: string, email: string, password: string) => {

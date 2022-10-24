@@ -31,15 +31,6 @@ const NewPost: React.FC<NewPostProps> = ({}) => {
   const [filename, setFileName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  // const INIT_STATE:INewPost = {
-  //   content: '',
-  //   file: undefined,
-  //   fileName: '',
-  //   loading: false
-  // }
-
-  // const [state, dispatch] = useReducer(reducer, INIT_STATE)
-
   const router = useRouter();
 
   const { addPost } = usePost();
@@ -59,7 +50,6 @@ const NewPost: React.FC<NewPostProps> = ({}) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("image has been uploaded");
         setFileName(data.file);
         setLoading(false);
         setFile(undefined);
