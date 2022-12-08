@@ -30,8 +30,9 @@ import { Divider } from "@material-ui/core";
 import { convertDate } from "../../../utils/convertDate";
 import Link from "next/link";
 import usePost from "../../context/post/PostContext";
-import { useSessionStorage } from "../../hooks/useSessionStorage";
 import { Toaster } from "react-hot-toast";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import useComments from "../../context/comments/CommentsContext";
 
 interface PostProps {
   post: IPost;
@@ -60,58 +61,37 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 const Post: React.FC<PostProps> = ({ post }) => {
   const classes = useStyles(useStyles);
 
-  const { likePost, dislike, addComment } = usePost();
+  const { addRemoveLike } = usePost();
+  const { addComment } = useComments();
+
   const [expandComment, setExpandComment] = useState<boolean>(false);
   const [expanded, setExpanded] = React.useState(false);
   const [comment, setComment] = useState<string>("");
-  const [likedPost, setLikedPost] = React.useState(false);
 
-  const [userData] = useSessionStorage("userData", "");
+  const [userData] = useLocalStorage("userData", "");
 
-  const handleLike = () => {
-    if (post.likes[0]?.isLiked) {
-      dislike(post.likes[0].id);
-      setLikedPost(false);
-    } else if (!post.likes[0]?.isLiked) {
-      likePost(post.id);
-      setLikedPost(true);
-    }
-  };
-
-  const handleExpandClick = () => {
+  const handleExpandClick = async () => {
     setExpanded(!expanded);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+    e.preventDefault();
     addComment(post.id, comment);
     setComment("");
   };
 
-  useEffect(() => {
-    if (post.likes[0]?.isLiked) {
-      setLikedPost(true);
-    } else {
-      setLikedPost(false);
-    }
-  }, []);
-
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
+
+  const check = post.likes.find((like) => like.id === userData.id);
 
   return (
     <Box className={classes.wrap_post}>
       <Toaster />
-      <Card
-        sx={{
-          maxWidth: 700,
-        }}
-      >
+      <Card>
         <CardHeader
           avatar={
             <Link href={`/user/${post.author.name}`} passHref>
-              <Avatar
-                sx={{ bgcolor: red[500], cursor: "pointer" }}
-                aria-label="recipe"
-              >
+              <Avatar src={`${post.author.profile_pic_url}`} alt="thumbnails">
                 {post.author.name.charAt(0)}
               </Avatar>
             </Link>
@@ -125,13 +105,13 @@ const Post: React.FC<PostProps> = ({ post }) => {
         />
         <Box className={classes.image_wrap}>
           <Image
-            src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post.images[0]}`}
+            src={`${post.media[0].mediaFile}`}
             layout="fill"
             objectFit="cover"
           />
         </Box>
         <CardContent>
-          <Typography variant="h6">{post.caption}</Typography>
+          <Typography variant="h6">{post.content}</Typography>
         </CardContent>
 
         <CardActions disableSpacing>
@@ -139,8 +119,8 @@ const Post: React.FC<PostProps> = ({ post }) => {
             {...label}
             icon={<FavoriteBorder />}
             checkedIcon={<Favorite sx={{ color: red[400] }} />}
-            onClick={handleLike}
-            checked={likedPost}
+            checked={check ? true : false}
+            onClick={() => addRemoveLike(post.id)}
           />
 
           <IconButton
@@ -149,14 +129,16 @@ const Post: React.FC<PostProps> = ({ post }) => {
           >
             <CommentIcon />
           </IconButton>
-          <ExpandMore
-            expand={expanded}
-            onClick={handleExpandClick}
-            aria-expanded={expanded}
-            aria-label="show more"
-          >
-            <ExpandMoreIcon />
-          </ExpandMore>
+          {post.comments?.length !== 0 ? (
+            <ExpandMore
+              expand={expanded}
+              onClick={handleExpandClick}
+              aria-expanded={expanded}
+              aria-label="show more"
+            >
+              <ExpandMoreIcon />
+            </ExpandMore>
+          ) : null}
         </CardActions>
 
         {/* comments */}
@@ -168,8 +150,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
           className={classes.collapse}
         >
           <Divider />
-
-          {post.comments.map((comment) => (
+          {post.comments?.map((comment) => (
             <Stack
               direction="column"
               justifyContent={"center"}
@@ -185,21 +166,24 @@ const Post: React.FC<PostProps> = ({ post }) => {
                   alignItems="center"
                   flexBasis={"50%"}
                 >
-                  <Avatar sx={{ width: 24, height: 24 }}>
-                    {userData.name?.charAt(0)}
+                  <Avatar
+                    src={`${post.author.profile_pic_url}`}
+                    alt="thumb"
+                    sx={{ width: 24, height: 24 }}
+                  >
+                    {post.author.name.charAt(0)}
                   </Avatar>
                   <Typography ml={1} fontSize={14}>
                     {userData.name}
                   </Typography>
                 </Box>
                 <Box flexBasis={"45%"} display="flex" justifyContent="flex-end">
-                  {/* color="rgba(255,255,255,0.8)" */}
                   <Typography>{convertDate(post.createdAt)}</Typography>
                 </Box>
               </Box>
               <Box maxWidth={"95%"}>
                 <Typography ml={5} fontSize={14}>
-                  {comment.reply}
+                  {comment.content}
                 </Typography>
               </Box>
             </Stack>
@@ -207,29 +191,23 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
           <Divider />
         </Collapse>
-        {expandComment && (
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Box flex={3}>
-              <TextField
-                type="text"
-                name="comment"
-                placeholder="Write comment .."
-                fullWidth
-                onChange={(e) => setComment(e.target.value)}
-                value={comment}
-              />
-            </Box>
-            <Box>
-              <IconButton onClick={handleSubmit}>
-                <ReplyIcon />
-              </IconButton>
-            </Box>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box flex={3}>
+            <TextField
+              type="text"
+              name="comment"
+              placeholder="Write comment .."
+              fullWidth
+              onChange={(e) => setComment(e.target.value)}
+              value={comment}
+            />
           </Box>
-        )}
+          <Box>
+            <IconButton onClick={handleSubmit}>
+              <ReplyIcon />
+            </IconButton>
+          </Box>
+        </Box>
       </Card>
     </Box>
   );

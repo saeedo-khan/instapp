@@ -10,16 +10,16 @@ import {
 } from "@material-ui/core";
 import { Theme, IconButton } from "@mui/material";
 import { RiSettings3Line } from "react-icons/ri";
-import image1 from "../../../assets/6f03eb85463c.jpg";
 import axios from "axios";
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
 import MiniProfileImage from "../../../components/miniProfileImage/MiniProfileImage";
 import useUsers from "../../../context/users/UsersContext";
-import { useSessionStorage } from "../../../hooks/useSessionStorage";
 import Meta from "../../../components/Meta";
 import { Toaster } from "react-hot-toast";
-import { IFollowers } from "../../../interfaces/types";
+import { IFollower } from "../../../interfaces/types";
 import Link from "next/link";
+import WithAuth from "../../../HOCs/WithAuth";
+import { useLocalStorage } from "../../../hooks/useLocalStorage";
 
 interface profileProps {}
 
@@ -151,9 +151,9 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const res = await axios.get("http://localhost:3000/users");
+  const res = await axios.get("http://localhost:3000/api/users");
 
-  const paths = res.data.map((user: any) => {
+  const paths = res.data.data.users.map((user: any) => {
     return {
       params: {
         username: user.name.toString(),
@@ -168,12 +168,14 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const res = await fetch(`http://localhost:3000/users/${params?.username}`);
-  const data = await res.json();
+  console.log(params);
+  const res = await axios.get(
+    `http://localhost:3000/api/users/${params?.username}`
+  );
 
   return {
     props: {
-      instaUser: data,
+      instaUser: res.data,
     },
   };
 };
@@ -192,7 +194,7 @@ const Profile: React.FC<profileProps> = ({
   const { followUser, unFollowUser } = useUsers();
   const [followed, setFollowed] = React.useState<boolean>(false);
 
-  const [userData] = useSessionStorage("userData", "");
+  const [userData] = useLocalStorage("userData", "");
 
   const handleFollow = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -205,7 +207,7 @@ const Profile: React.FC<profileProps> = ({
 
     // check if follow the user
     const checkFollower = instaUser.followers.find(
-      (follower: IFollowers) => follower.followerId
+      (follower: IFollower) => follower.followerId
     );
 
     if (checkFollower) {
@@ -213,14 +215,6 @@ const Profile: React.FC<profileProps> = ({
       setFollowed(false);
     }
   };
-
-  useEffect(() => {
-    if (instaUser.followers[0]?.isFollower) {
-      setFollowed(true);
-    } else {
-      setFollowed(false);
-    }
-  }, []);
 
   return (
     <>
@@ -230,7 +224,7 @@ const Profile: React.FC<profileProps> = ({
           <Box className={classes.top_profile}>
             <Box className={classes.profile_img_wrap}>
               <Image
-                src={userData.thumbUrl ? userData.thumbUrl : image1}
+                src={`${instaUser.profile_pic_url}`}
                 layout="fill"
                 objectFit="cover"
                 objectPosition="center"
@@ -243,11 +237,13 @@ const Profile: React.FC<profileProps> = ({
                 <Typography className={classes.profile_username}>
                   {instaUser.name}
                 </Typography>
-                <Link href={`/user/${instaUser.name}/settings`}>
-                  <IconButton size="large">
-                    <RiSettings3Line />
-                  </IconButton>
-                </Link>
+                {instaUser.id === userData.id ? (
+                  <Link href={`/user/${instaUser.name}/settings`}>
+                    <IconButton size="large">
+                      <RiSettings3Line />
+                    </IconButton>
+                  </Link>
+                ) : null}
               </Box>
 
               <Box>
@@ -257,7 +253,7 @@ const Profile: React.FC<profileProps> = ({
                     className={classes.edit_btn}
                     fullWidth
                   >
-                    {followed ? (
+                    {!followed ? (
                       <Typography onClick={handleUnfollow}>unfollow</Typography>
                     ) : (
                       <Typography onClick={handleFollow}>Follow</Typography>
@@ -269,9 +265,7 @@ const Profile: React.FC<profileProps> = ({
           </Box>
 
           <Box className={classes.bio}>
-            <Typography className={classes.bio_text}>
-              {!instaUser.statusMessage && null}
-            </Typography>
+            <Box>{instaUser.biography ? instaUser.biography : ""}</Box>
           </Box>
         </Box>
 
@@ -334,4 +328,4 @@ const Profile: React.FC<profileProps> = ({
   );
 };
 
-export default Profile;
+export default WithAuth(Profile);

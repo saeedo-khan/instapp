@@ -5,37 +5,18 @@ import {
   ListItemAvatar,
   ListItemButton,
   ListItemText,
-  Button,
-  IconButton,
-  Typography,
 } from "@mui/material";
-import { IoPersonAdd } from "react-icons/io5";
-import { IAuthor } from "../../interfaces/types";
-import { useSessionStorage } from "../../hooks/useSessionStorage";
+import { IUser } from "../../interfaces/types";
 import Link from "next/link";
+import { suggestionProps } from "../sidebar/Sidebar";
 // IoPersonRemove ---unfollow user
 interface UsersListProps {
-  data: IAuthor;
+  user: IUser;
 }
 
-const UsersList: React.FC<UsersListProps> = ({ data }) => {
-  const [userData] = useSessionStorage("userData", "");
-
-  return (
-    <>
-      <Typography>Add new friends: </Typography>
-      <ListItem>
-        <Link href={`/user/${data.name}`}>
-          <ListItemButton>
-            <ListItemAvatar>
-              <Avatar alt={data.thumbUrl} />
-            </ListItemAvatar>
-            <ListItemText id="labelId" primary={data.name} />
-          </ListItemButton>
-        </Link>
-      </ListItem>
-    </>
-  );
+const UsersList: React.FC<UsersListProps> = ({ user }) => {
+  console.log("Hell yaah");
+  return <div></div>;
 };
 
 export default UsersList;

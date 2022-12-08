@@ -1,25 +1,27 @@
 import axios from "axios";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext } from "react";
 import toast from "react-hot-toast";
-import { useSessionStorage } from "../../hooks/useSessionStorage";
-import { Gender } from "../../interfaces/types";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 interface UsersContextProps {
   children: React.ReactNode;
 }
 
 interface IUsersData {
-  updateUserData: (changeData: IUpdateUser) => void;
+  updateUserData: (changeData: IUpdateUsers) => void;
+  uploadProfilePic: ({ pic, userId }: { pic: string; userId: string }) => void;
+  deleteUser: () => void;
+  changePassword: (currentPass: string, newPass: string) => void;
   followUser: (followerId: string) => void;
   unFollowUser: (followerId: string) => void;
 }
 
-interface IUpdateUser {
-  id: string | null;
-  name: string | null;
-  thumbUrl: string | null;
-  gender: Gender | null;
-  statusMessage: string | null;
+interface IUpdateUsers {
+  userId: string;
+  username: string;
+  email: string;
+  gender: string;
+  biography?: string;
 }
 
 const UserContext = createContext({} as IUsersData);
@@ -27,19 +29,26 @@ const UserContext = createContext({} as IUsersData);
 export const UsersContextProvider: React.FC<UsersContextProps> = ({
   children,
 }) => {
-  const [userData] = useSessionStorage("userData", "");
+  const [userData] = useLocalStorage("userData", "");
 
-  const updateUserData = (changeData: IUpdateUser) => {
-    const { name, thumbUrl, gender, statusMessage } = changeData;
+  const updateUserData = ({
+    username,
+    email,
+    gender,
+    biography,
+    userId,
+  }: IUpdateUsers) => {
     const userUpdate = {
-      id: userData.id,
-      name,
-      thumbUrl,
+      id: userId,
+      name: username,
+      email,
       gender,
-      statusMessage,
+      biography,
     };
     axios
-      .put(`http://localhost:3000/users/${userData.id}`, userUpdate)
+      .patch(`http://localhost:3000/api/users/details`, userUpdate, {
+        withCredentials: true,
+      })
       .then((res) => {
         toast.success("User updated", {
           position: "top-center",
@@ -52,6 +61,48 @@ export const UsersContextProvider: React.FC<UsersContextProps> = ({
           duration: 4000,
         });
       });
+  };
+
+  const uploadProfilePic = ({
+    pic,
+    userId,
+  }: {
+    pic: string;
+    userId: string;
+  }) => {
+    axios
+      .patch(
+        `http://localhost:3000/api/users/upload_profile_pic`,
+        { profileImage: pic, currentUser: userId },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => console.log(res))
+      .catch((err) => console.error(err));
+  };
+
+  const changePassword = (currentPass: string, newPass: string) => {
+    const changePass = {
+      currentPass,
+      newPass,
+      currentUser: userData.id,
+    };
+    axios
+      .patch(`http://localhost:3000/api/users/changePassword`, changePass, {
+        withCredentials: true,
+      })
+      .then((res) => console.log(res))
+      .catch((err) => console.error(err));
+  };
+
+  const deleteUser = () => {
+    axios
+      .delete(`http://localhost:3000/api/users/${userData.id}`, {
+        withCredentials: true,
+      })
+      .then((res) => console.log(res))
+      .catch((err) => console.error(err));
   };
 
   const followUser = (followerId: string) => {
@@ -94,7 +145,16 @@ export const UsersContextProvider: React.FC<UsersContextProps> = ({
   };
 
   return (
-    <UserContext.Provider value={{ followUser, unFollowUser, updateUserData }}>
+    <UserContext.Provider
+      value={{
+        followUser,
+        unFollowUser,
+        updateUserData,
+        uploadProfilePic,
+        deleteUser,
+        changePassword,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

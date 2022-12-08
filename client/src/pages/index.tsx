@@ -1,52 +1,72 @@
-import React, { useEffect } from "react";
-import type { GetStaticProps, InferGetStaticPropsType, NextPage } from "next";
-import { Box } from "@mui/material";
+import React from "react";
+import type { GetStaticProps, NextPage } from "next";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Post from "../components/posts/Post";
 import axios from "axios";
-
 import { IPost } from "../interfaces/types";
-import { useRouter } from "next/router";
+import useSWR, { SWRConfig } from "swr";
+import WithAuth from "../HOCs/WithAuth";
+import Sidebar from "../components/sidebar/Sidebar";
 
-export const getStaticProps: GetStaticProps = async () => {
-  const res = await axios.get("http://localhost:3000/posts");
-
-  return {
-    props: {
-      instaPosts: res.data,
-    },
+interface IDataPost {
+  type: string;
+  message: string;
+  data: {
+    posts: IPost[];
   };
-};
+}
 
-const Home: NextPage = (
-  props: InferGetStaticPropsType<typeof getStaticProps>
-) => {
-  const data = [...props.instaPosts].reverse();
-  const router = useRouter();
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/whoami", {
-        withCredentials: true,
-        headers: { "x-access-token": `${localStorage.getItem("token")}` },
-      })
-      .catch((err) => {
-        localStorage.removeItem("token");
-        router.reload();
-      });
-  }, []);
+// export const getStaticProps: GetStaticProps = async () => {
+//   const res = await axios("http://localhost:3000/api/posts/all_posts", {
+//     withCredentials: true,
+//   });
 
-  if (localStorage.getItem("token")) {
-    return (
-      <Box sx={{ maxWidth: 900, margin: "0 auto" }}>
-        {data.map((post: IPost, idx: number) => (
+//   return {
+//     props: {
+//       // SWR will use fallback only if data updated otherwise will use cache data
+//       fallback: {
+//         "/all_posts": res.data.data,
+//       },
+//     },
+//   };
+// };
+
+const getPost = () => {};
+
+const Home: NextPage = () => {
+  const { data } = useSWR<IDataPost, any[]>(
+    "http://localhost:3000/api/posts/all_posts",
+    fetcher
+  );
+
+  const theme = useTheme();
+  const med = useMediaQuery(theme.breakpoints.down("md"));
+
+  return (
+    <Box display={"flex"} justifyContent="center" width="100%">
+      <Box
+        flex={4}
+        display="flex"
+        justifyContent="center"
+        flexDirection="column"
+        alignItems="center"
+      >
+        {data?.data.posts.map((post: IPost, idx: number) => (
           <Post post={post} key={post.id} idx={idx} />
         ))}
       </Box>
-    );
-  } else {
-    router.push("/auth/login");
-    return <div></div>;
-  }
+
+      {!med ? (
+        <Box sx={{ flex: 1, position: "sticky" }}>
+          <Sidebar />
+        </Box>
+      ) : null}
+    </Box>
+  );
+
+  // return <SWRConfig value={{ fallback }}>{getPost()}</SWRConfig>;
 };
 
-export default Home;
+export default WithAuth(Home);

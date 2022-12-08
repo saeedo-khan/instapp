@@ -22,5 +22,17 @@ export const LoginSchema = Yup.object().shape({
     password: Yup.string()
         .min(6, 'Password Should be between 6 and 22')
         .max(22, 'Too long!')
-        .required('Shouldnt be empty')
+        .required('Should not be empty')
+})
+
+
+export const NewPasswordValid = Yup.object().shape({
+    currentPassword: Yup.string()
+        .min(6, "Password should be between 6 and 22")
+        .max(22, "Too long!")
+        .required('Should not be empty'),
+    newPass: Yup.string()
+        .min(6, "Password should be between 6 and 22")
+        .max(22, "Too long!")
+        .required('Should not be empty')
 })

@@ -21,21 +21,24 @@ import CommentIcon from "@mui/icons-material/Comment";
 import ReplyIcon from "@mui/icons-material/Reply";
 import { createStyles, makeStyles } from "@material-ui/core";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { IPost } from "../../interfaces/types";
+import { convertDate } from "../../../utils/convertDate";
+import usePost from "../../context/post/PostContext";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 interface ProfilePostProps {
-  post: any;
-  id: any;
-  pathname: any;
+  post: IPost | undefined;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    profilePost: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "flex-start",
+    profile_post: {
       lineHeight: 5,
       width: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "column",
     },
     container: {
       width: 700,
@@ -74,23 +77,47 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "block",
       width: "100%",
     },
+    comments_section: {
+      width: 700,
+      backgroundColro: "rgba(0,0,0,0.2)",
+      justifyContent: "center",
+      display: "flex",
+      flexDirection: "column",
+      margin: "0 auto",
+      [theme.breakpoints.down("sm")]: {
+        width: "100%",
+      },
+    },
   })
 );
 
-const ProfilePost: React.FC<ProfilePostProps> = ({ post, id, pathname }) => {
+const ProfilePost: React.FC<ProfilePostProps> = ({ post }) => {
   const classes = useStyles();
 
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
+  const [userData] = useLocalStorage("userData", "");
+
   const [expandComment, setExpandComment] = useState<boolean>(false);
+  const [comment, setComment] = useState<string>("");
 
   const handleExpandClick = () => {
     setExpandComment(!expandComment);
   };
 
+  const handleComment = () => {
+    addComment(post?.id, comment);
+    handleExpandClick();
+    setComment("");
+  };
+
+  const { addComment } = usePost();
+
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  console.log(post);
 
   return (
     <>
@@ -110,24 +137,25 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post, id, pathname }) => {
         </Box>
       </Modal>
 
-      <Box className={classes.profilePost}>
+      <Box className={classes.profile_post}>
         <Box className={classes.container}>
           <Stack direction="row" spacing={1} alignItems="center">
             <Box ml={1}>
-              <Link href={`/user/${post.author.name}`} passHref>
-                <Avatar sx={{ cursor: "pointer" }}>S</Avatar>
+              <Link href={`/user/${post?.author.name}`} passHref>
+                <Avatar
+                  src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post?.author.profile_pic_url}`}
+                  sx={{ cursor: "pointer" }}
+                >
+                  {post?.author.name.charAt(0)}
+                </Avatar>
               </Link>
             </Box>
-            <Box>
-              <Link href={`/user/${post.author.name}`} passHref>
-                {post.author.name}
-              </Link>
-            </Box>
+            <Box>{post?.author.name}</Box>
           </Stack>
           <Box className={classes.imgWrap}>
             <Image
-              src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post.images[0]}`}
-              alt={post.caption}
+              src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post?.images[0]}`}
+              alt={`${post?.caption}`}
               layout="fill"
               objectFit="cover"
             />
@@ -146,9 +174,11 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post, id, pathname }) => {
               <CommentIcon />
             </IconButton>
 
-            <IconButton aria-label="remove post" onClick={handleOpen}>
-              <DeleteIcon />
-            </IconButton>
+            {userData.id === post?.author.id && (
+              <IconButton aria-label="remove post" onClick={handleOpen}>
+                <DeleteIcon />
+              </IconButton>
+            )}
           </Stack>
 
           {expandComment && (
@@ -159,15 +189,65 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post, id, pathname }) => {
                   type="text"
                   placeholder="Write comment..."
                   fullWidth
+                  onChange={(e) => setComment(e.target.value)}
                 />
               </Box>
               <Box>
-                <IconButton onClick={handleExpandClick}>
+                <IconButton onClick={handleComment}>
                   <ReplyIcon />
                 </IconButton>
               </Box>
             </Box>
           )}
+
+          <Box className={classes.comments_section}>
+            {post?.comments.map((comment) => (
+              <Stack
+                direction="column"
+                justifyContent={"center"}
+                paddingY={2}
+                key={comment.id}
+                boxShadow={1}
+              >
+                <Box display={"flex"} alignItems={"center"}>
+                  <Box
+                    component={"span"}
+                    paddingY={1}
+                    pl={1}
+                    display="flex"
+                    alignItems="center"
+                    flexBasis={"50%"}
+                  >
+                    <Avatar
+                      src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post.author.profile_pic_url}`}
+                      alt="thumb"
+                    >
+                      {userData.name?.charAt(0)}
+                    </Avatar>
+                    <Typography ml={1} fontSize={14}>
+                      {userData.name}
+                    </Typography>
+                  </Box>
+                  <Box
+                    flexBasis={"45%"}
+                    display="flex"
+                    justifyContent="flex-end"
+                  >
+                    {/* color="rgba(255,255,255,0.8)" */}
+                    <Typography>{convertDate(post.createdAt)}</Typography>
+                  </Box>
+                </Box>
+                <Box maxWidth={"95%"}>
+                  <Typography ml={5} fontSize={14}>
+                    {comment.reply}
+                  </Typography>
+                  <IconButton>
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              </Stack>
+            ))}
+          </Box>
         </Box>
       </Box>
     </>

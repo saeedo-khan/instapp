@@ -24,9 +24,11 @@ export interface User extends CustomRequest {
 }
 
 
+
 const verifyToken = async (req:Request, res:Response, next:NextFunction) => {
 
-    const token = req.body.token || req.query.token || req.headers["x-access-token"];
+    const token = req.cookies.accessToken;
+    
     if(!token){
         return res.status(403).json({ message: "Authorization denied, Please login"})
     }
@@ -34,12 +36,11 @@ const verifyToken = async (req:Request, res:Response, next:NextFunction) => {
     try {        
         const decoded = <any>jwt.verify(token, process.env.TOKEN_KEY);
         // (req as CustomRequest).token = data;
-        (req as User).user = decoded
+        (req as CustomRequest).token = decoded
         
         next()        
     } catch (error) {
-        res.clearCookie("access_token")
-        return res.status(400).json({ message: "Please authenticate"})
+        res.status(401).send('Please authenticate');
     }
 }
 

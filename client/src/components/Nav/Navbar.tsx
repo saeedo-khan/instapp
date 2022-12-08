@@ -6,7 +6,6 @@ import {
   Toolbar,
   Box,
   InputBase,
-  Avatar,
   Modal,
   Menu,
   MenuItem,
@@ -24,7 +23,7 @@ import { AccountCircle } from "@mui/icons-material";
 import Link from "next/link";
 import useAuth from "../../context/auth/AuthContext";
 import { useRouter } from "next/router";
-import { useSessionStorage } from "../../hooks/useSessionStorage";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -75,7 +74,7 @@ const Navbar = () => {
 
   const router = useRouter();
 
-  const [user] = useSessionStorage("userData", "");
+  const [user] = useLocalStorage("userData", "");
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -103,7 +102,7 @@ const Navbar = () => {
         onClose={() => setOpen(false)}
         sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
       >
-        <NewPost />
+        <NewPost modelStatus={setOpen} />
       </Modal>
 
       <AppBar position="sticky" className={classes.nav_appbar}>
@@ -142,9 +141,11 @@ const Navbar = () => {
                 </IconButton>
               </Link>
 
-              <IconButton onClick={() => setOpen(true)} size="large">
-                <AddBoxOutlinedIcon sx={{ color: "rgba(255,255,255,0.5)" }} />
-              </IconButton>
+              {router.pathname === "/" && (
+                <IconButton onClick={() => setOpen(true)} size="large">
+                  <AddBoxOutlinedIcon sx={{ color: "rgba(255,255,255,0.5)" }} />
+                </IconButton>
+              )}
 
               <IconButton
                 size="large"
@@ -190,7 +191,6 @@ const Navbar = () => {
                 <MenuItem
                   onClick={() => {
                     handleClose();
-                    router.replace(`/suggest_users`);
                   }}
                 >
                   Add Friends

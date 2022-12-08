@@ -1,48 +1,55 @@
-import React, { useReducer, useState } from "react";
+import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import { Box, Typography, Input } from "@mui/material";
 import useStyles from "./NewPost.styles";
-import {
-  CircularProgress,
-  InputLabel,
-  TextareaAutosize,
-  TextField,
-} from "@material-ui/core";
+import { CircularProgress, TextareaAutosize } from "@material-ui/core";
 import usePost from "../../context/post/PostContext";
-import { useRouter } from "next/router";
-import toast from "react-hot-toast";
 
 //  Reusable clickoutside hook
 
-interface NewPostProps {}
-
-interface INewPost {
-  content: string;
-  file: undefined | string;
-  fileName: string;
-  loading: boolean;
+interface NewPostProps {
+  modelStatus: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NewPost: React.FC<NewPostProps> = ({}) => {
+interface IUploadFile {
+  file: {
+    encoding: string;
+    fieldName: string;
+    filename: string;
+    mimetype: string;
+    originalName: string;
+    path: string;
+    size: number;
+  };
+}
+
+const NewPost: React.FC<NewPostProps> = ({ modelStatus }) => {
   const classes = useStyles(useStyles);
 
   const [content, setContent] = useState<string>("");
-  const [file, setFile] = useState<File | undefined>(undefined);
-  const [filename, setFileName] = useState<string>("");
+  // const [fileInputState, setFileInputState] = useState<File | undefined>(
+  //   undefined
+  // );
+  const [selectedFile, setSelectedFile] = useState<string | null>();
+  const [previewSource, setPreviewSource] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
-
-  const router = useRouter();
 
   const { addPost } = usePost();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
-    if (!fileList) return;
+    previewFile(fileList);
+  };
 
-    setFile(fileList[0]);
+  const previewFile = (file: any) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file[0]);
+    reader.onload = () => {
+      setPreviewSource(reader.result);
+    };
 
     const formData = new FormData();
-    formData.append("post", fileList[0]);
+    formData.append("post", file[0]);
     setLoading(true);
     fetch("http://localhost:3000/upload_files", {
       method: "POST",
@@ -50,19 +57,21 @@ const NewPost: React.FC<NewPostProps> = ({}) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setFileName(data.file);
+        console.log(data);
+        setSelectedFile(data.path);
         setLoading(false);
-        setFile(undefined);
       })
       .catch((err) => {
-        toast.error("Failed to Upload Image");
+        setLoading(false);
+        console.log(err);
       });
   };
 
   const handleSubmit = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.preventDefault();
-    if (filename && content) {
-      addPost(content, filename);
+    if (selectedFile && content) {
+      addPost(content, selectedFile);
+      modelStatus(false);
     }
   };
 
@@ -82,7 +91,7 @@ const NewPost: React.FC<NewPostProps> = ({}) => {
               className={classes.btn_post}
               onClick={handleSubmit}
               disabled={Boolean(
-                filename.length && content.length !== 0 ? false : true
+                selectedFile?.length && content.length !== 0 ? false : true
               )}
             >
               Post
@@ -94,10 +103,26 @@ const NewPost: React.FC<NewPostProps> = ({}) => {
           {loading && <CircularProgress color="primary" />}
 
           <Box className={classes.files_detail}>
-            <Box mt={1} mb={1}>
-              <Typography className={classes.addFile_text}>
-                Add Photo or Video Here
-              </Typography>
+            {!selectedFile ? (
+              <Box mt={1} mb={1}>
+                <Typography className={classes.addFile_text}>
+                  Add Photo or Video Here
+                </Typography>
+              </Box>
+            ) : null}
+
+            <Box sx={{ position: "relative", width: 300, height: 400 }}>
+              {previewSource ? (
+                <img
+                  src={previewSource}
+                  alt="chosen"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
+                />
+              ) : null}
             </Box>
 
             <Input

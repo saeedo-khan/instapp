@@ -3,17 +3,36 @@ import {
   Box,
   Button,
   Divider,
+  FormLabel,
+  MenuItem,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
-import React, { useState } from "react";
+import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { BarLoader } from "react-spinners";
+import FormChangePassword from "../../../../components/changePassword/FormChangePassword";
 import Meta from "../../../../components/Meta";
 import useUsers from "../../../../context/users/UsersContext";
-import { useSessionStorage } from "../../../../hooks/useSessionStorage";
+import WithAuth from "../../../../HOCs/WithAuth";
+
+// interface IUpdateUser {
+//   name: string;
+//   profile_pic_url: string;
+//   email: string;
+//   gender: string;
+//   biography: string;
+// }
+
+// interface IUpdateUserDetails {
+//   type: string;
+//   message: string;
+//   data: IUpdateUser[];
+// }
 
 const Settings = () => {
   Meta.defaultProps = {
@@ -22,56 +41,33 @@ const Settings = () => {
     description: "interactive with people from around the world",
   };
 
-  const [userData, setUserData] = useSessionStorage("userData", "");
-
-  const [fileName, setFileName] = useState<string>("");
   const [file, setFile] = useState<File | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
-  const { updateUserData } = useUsers();
 
-  const initialState = {
-    id: null,
-    name: null,
-    thumbUrl: fileName ? fileName : null,
-    gender: null,
-    statusMessage: null,
+  const [username, setUsername] = useState<string>("");
+  const [biography, setBiography] = useState<string>("");
+  const [profilePic, setProfilePic] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [userId, setUserId] = useState<string>("");
+
+  const { updateUserData, uploadProfilePic } = useUsers();
+
+  const handleBiography = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setBiography(e.target.value);
+  const handleUsername = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setUsername(e.target.value);
+  const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setEmail(e.target.value);
+  const handleGenderChange = (event: SelectChangeEvent) => {
+    setGender(event.target.value as string);
   };
-  console.log(fileName);
-  const [changeSettings, setChangeSettings] = React.useState(initialState);
 
   const handleUpdateClick = (
     e: React.MouseEvent<HTMLSpanElement, MouseEvent>
   ) => {
     e.preventDefault();
-    updateUserData(changeSettings);
-  };
-
-  const handleRemoveThumb = (
-    e: React.MouseEvent<HTMLSpanElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-    const thumbData = {
-      thumbUrl: null,
-    };
-    axios
-      .put(`http://localhost:3000/users/${userData.id}`, thumbData)
-      .then((res) => {
-        console.log(res);
-        setUserData({
-          ...userData,
-          thumbUrl: null,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setChangeSettings({
-      ...changeSettings,
-      [e.target.name]: e.target.value,
-    });
+    updateUserData({ userId, username, biography, email, gender });
   };
 
   const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,8 +77,8 @@ const Settings = () => {
     setFile(fileList[0]);
     setLoading(true);
     const formData = new FormData();
-    formData.append("thumb", fileList[0]);
-    fetch("http://localhost:3000/upload_thumb", {
+    formData.append("post", fileList[0]);
+    fetch("http://localhost:3000/upload_files", {
       method: "POST",
       body: formData,
     })
@@ -90,17 +86,30 @@ const Settings = () => {
       .then((data) => {
         console.log(data);
         setLoading(false);
-        setFileName(data.file);
         setFile(undefined);
-        setUserData({
-          ...userData,
-          thumbUrl: data.file,
-        });
+        uploadProfilePic({ pic: data.path, userId });
+        setProfilePic(data.path);
       })
       .catch((err) => {
         setLoading(false);
       });
   };
+
+  const router = useRouter();
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3000/api/users/${router.query.username}`)
+      .then((res) => {
+        setUsername(res.data.data.user.name);
+        setBiography(res.data.data.user.biography);
+        setProfilePic(res.data.data.user.profile_pic_url);
+        setGender(res.data.data.user.gender);
+        setEmail(res.data.data.user.email);
+        setUserId(res.data.data.user.id);
+      })
+      .catch((err) => console.log(err));
+  }, []);
 
   return (
     <>
@@ -123,14 +132,13 @@ const Settings = () => {
                 alignItems="center"
                 display="flex"
               >
-                <Avatar src={fileName ? `${fileName}` : ""} />
+                <Avatar alt="thumb" src={`${profilePic}`} />
               </Box>
               <Box flex={1}>
                 <Button variant="contained" component="label">
                   Upload
                   <input type="file" hidden onChange={handleUploadImage} />
                 </Button>
-                <Button onClick={handleRemoveThumb}>Remove</Button>
               </Box>
             </Stack>
           </Box>
@@ -140,35 +148,46 @@ const Settings = () => {
         <Box>
           <TextField
             id="outlined-multiline-static"
-            label="Bio"
+            placeholder="Bio"
             multiline
             rows={4}
             fullWidth
             variant="outlined"
-            name="statusMessage"
+            name="biography"
             sx={{ fontSize: 16 }}
-            onChange={handleChange}
+            value={biography}
+            onChange={handleBiography}
           />
         </Box>
         <Divider />
         <Box display="flex" flexDirection="column">
+          {/* <FormLabel>username</FormLabel> */}
           <TextField
             id="outlined-basic"
-            label="Display Name"
             name="name"
-            defaultValue={userData.name}
+            placeholder="Username"
+            value={username}
             sx={{ marginBottom: 3 }}
-            onChange={handleChange}
+            onChange={handleUsername}
           />
-          <TextField
-            id="outlined-basic-name"
-            label="Email"
-            name="email"
-            defaultValue={userData.email}
-            disabled={true}
-            onChange={handleChange}
-          />
+          <TextField name="email" value={email} disabled={true} />
         </Box>
+
+        <Box>
+          <Select
+            labelId="demo-simple-select-autowidth-label"
+            id="demo-simple-select-autowidth"
+            autoWidth
+            label="gender"
+            value={gender}
+            onChange={handleGenderChange}
+          >
+            <MenuItem value={"FEMALE"}>Female</MenuItem>
+            <MenuItem value={"MALE"}>Male</MenuItem>
+          </Select>
+        </Box>
+
+        <FormChangePassword />
 
         <Box>
           <Typography>Delete account</Typography>
@@ -177,6 +196,7 @@ const Settings = () => {
           </Typography>
           <Box mt={2}>
             <Button>Delete account</Button>
+            <Button>Change Password</Button>
           </Box>
         </Box>
         <Box textAlign="center">
@@ -189,4 +209,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default WithAuth(Settings);

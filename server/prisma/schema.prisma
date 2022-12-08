@@ -12,75 +12,92 @@ datasource db {
 
 // statusMessage
 model User {
-  id              String     @id @default(uuid())
-  email           String     @unique
-  name            String     @unique
-  password        String?
-  token           String?
-  writtenPosts    Post[]     @relation("writtenPosts")
-  favouritePosts  Post[]     @relation("FavouritePosts")
-  profile_pic_url String?
-  gender          Gender?
-  biography       String?
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime?  @updatedAt
-  followers       Follower[] @relation(name: "UserFollower")
-  following       Follower[] @relation(name: "UserFollowing")
-  likesPost       PostLike[]
+  id                      String     @id @default(uuid())
+  email                   String     @unique
+  name                    String     @unique
+  password                String?
+  token                   String?
+  writtenPosts            Post[]     @relation("writtenPosts")
+  profile_pic_url         String?
+  gender                  UserGender @default(MALE)
+  taggedInPosts           PostTag[]  @relation("_UsersPostsTag")
+  biography               String?
+  createdAt               DateTime   @default(now())
+  updatedAt               DateTime?  @updatedAt
+  specificAudienceInPosts Post[]     @relation("_UsersPostsSpecificAudince")
+  followers               User[]     @relation(name: "FollowRelation")
+  following               User[]     @relation(name: "FollowRelation")
+  likePosts               Post[]     @relation("UsersPostsLike")
+  postComments            Comment[]
 }
 
 model Post {
-  id            String        @id @default(uuid())
-  caption       String?
-  images        String[]
-  likes         PostLike[]
-  published     Boolean       @default(false)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime?     @updatedAt
-  author        User          @relation("writtenPosts", fields: [authorId], references: [id])
-  authorId      String
-  favouriteBy   User?         @relation("FavouritePosts", fields: [favouriteById], references: [id])
-  favouriteById String?
-  comments      PostComment[]
-  PostTag       PostTag?      @relation(fields: [postTagId], references: [id])
-  postTagId     String?
+  id                      String           @id @default(uuid())
+  content                 String?
+  audience                PostAudienceEnum @default(PUBLIC)
+  specificAudienceFriends User[]           @relation("_UsersPostsSpecificAudince")
+  media                   PostMedia[]
+  taggedFriends           PostTag[]
+  likes                   User[]           @relation("UsersPostsLike")
+  published               Boolean          @default(false)
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+  author                  User             @relation("writtenPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId                String
+  comments                Comment[]
+}
+
+model PostMedia {
+  id        String        @id @default(uuid())
+  mediaFile String
+  longitude Int?
+  latitude  Int?
+  position  MediaPosition @default(IMAGE)
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
 }
 
 model PostTag {
-  id    String @id @default(uuid())
-  name  String @unique
-  posts Post[]
+  id            String  @id @default(uuid())
+  x_coordinates Float
+  y_coordinates Float
+  Post          Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId        String?
+  taggedUsers   User[]  @relation("_UsersPostsTag")
 }
 
-model PostComment {
-  id        Int       @id @default(autoincrement())
-  reply     String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  Post      Post?     @relation(fields: [postId], references: [id])
-  postId    String?
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  Post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
 }
 
-model PostLike {
-  id      Int     @id @default(autoincrement())
-  Post    Post?   @relation(fields: [postId], references: [id])
-  postId  String?
-  User    User?   @relation(fields: [userId], references: [id])
-  userId  String?
-  isLiked Boolean @default(false)
-}
+// model Follower {
+//   id         String   @id @default(uuid())
+//   user       User     @relation(name: "UserFollowing", fields: [userId], references: [id], onDelete: Cascade)
+//   userId     String
+//   follower   User     @relation(name: "UserFollower", fields: [followerId], references: [id], onDelete: Cascade)
+//   followerId String
+//   createdAt  DateTime @default(now())
+// }
 
-model Follower {
-  id         Int      @id @default(autoincrement())
-  user       User     @relation(name: "UserFollowing", fields: [userId], references: [id])
-  userId     String
-  follower   User     @relation(name: "UserFollower", fields: [followerId], references: [id])
-  followerId String
-  createdAt  DateTime @default(now())
-  isFollower Boolean  @default(false)
-}
-
-enum Gender {
-  FEMALE
+enum UserGender {
   MALE
+  FEMALE
+}
+
+enum PostAudienceEnum {
+  PUBLIC
+  FRIENDS
+  ONLY_ME
+  SPECIFIC
+}
+
+enum MediaPosition {
+  IMAGE
+  VIDEO
 }

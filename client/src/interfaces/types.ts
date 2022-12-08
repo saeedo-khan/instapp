@@ -1,55 +1,74 @@
+export interface IUser {
+  id: string;
+  email: string;
+  name: string;
+  password: string;
+  writtenPosts: IPost[];
+  token: string | null;
+  profile_pic_url: string;
+  gender: UserGender;
+  taggedInPosts: ITag[];
+  biography: string | null;
+  followers: IFollower[];
+  following: IFollower[];
+  likePosts: IPost[];
+  postComments: IComment[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface IPost {
-    id:            string;
-    caption:       null | string;
-    images:        string[];
-    published:     boolean;
-    createdAt:     Date;
-    updatedAt:     Date;
-    authorId:      string;
-    favouriteById: null;
-    postTagId:     null;
-    PostTag:       null;
-    comments:      any[];
-    author:     IAuthor;
-    likes:      ILikes[]
+  id: string;
+  content: string;
+  media: IMedia[];
+  audience: UserGender;
+  specificAudienceFriends: IUser[];
+  taggedFriends: ITag[];
+  published: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  authorId: string;
+  comments: IComment[];
+  author: IUser;
+  likes: IUser[];
 }
 
-export interface IAuthor {
-    id: string;
-    email: string;
-    name: string;
-    password: string;
-    token: string;
-    thumbUrl: string;
-    gender: Gender | null;
-    statusMessage: string;
-    isFollower: Boolean;
-    followers: IFollowers[]
-    following: IFollowing[]
+export interface IMedia {
+  id: string;
+  mediaFile: string;
+  longitude: number;
+  latitude: number;
+  position: PostAudienceEnum;
+  postId: string;
 }
 
-export interface ILikes {
-    id: number;
-    postId: string;
-    userId: string;
-    isLiked: boolean;
+export interface ITag {
+  id: string;
+  x_coordinates: number;
+  y_coordinates: number;
 }
 
-export interface IFollowers {
-    id: number;
-    followerId: string;
-    isFollower: boolean;
-    userId: string;
+export interface IComment {
+  id: string;
+  content: string;
+  createdAt: Date;
 }
 
-export interface IFollowing {
-    id: number;
-    followerId: string;
-    isFollower: boolean;
-    userId: string;
+export interface IFollower {
+  id: number;
+  followerId: string;
+  userId: string;
+  createdAt: Date;
 }
 
-export enum Gender {
-    MALE = 'male',
-    FEMALE = 'female'
+enum UserGender {
+  MALE,
+  FEMALE,
+}
+
+enum PostAudienceEnum {
+  PUBLIC,
+  FRIENDS,
+  ONLY_ME,
+  SPECIFIC,
 }

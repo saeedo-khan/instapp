@@ -3,9 +3,10 @@ import { Box, Theme } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { IPost } from "../../interfaces/types";
 
 interface MiniProfileImageProps {
-  post: any;
+  post: IPost;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -48,12 +49,16 @@ const MiniProfileImage: React.FC<MiniProfileImageProps> = ({ post }) => {
   const classes = useStyles();
   return (
     <Grid item xs={4} key={post.id}>
-      <Link href={`/p/[postId]?postId=${post.id}`} as={`/p/${post.id}`}>
+      <Link
+        href={`/p/[postId]?postId=${post.id}`}
+        as={`/p/${post.id}`}
+        passHref
+      >
         <Box className={classes.post_content}>
           <Box className={classes.overlayEffect}></Box>
           <Image
             src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post.images[0]}`}
-            alt={post.caption}
+            alt={`${post.caption}`}
             layout="fill"
             objectFit="cover"
           />

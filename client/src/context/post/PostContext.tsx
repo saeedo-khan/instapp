@@ -1,26 +1,27 @@
-import { useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import toast from "react-hot-toast";
-import { IPost } from "../../interfaces/types";
-import { useSessionStorage } from "../../hooks/useSessionStorage";
+import { ITag } from "../../interfaces/types";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 interface PostContextProps {
   children: React.ReactNode;
 }
 
-interface IPosts {
-  Post: IPost[];
+interface IAddRemoveLike {
+  type: string;
+  message: string;
+  data: {
+    isLiked: boolean;
+  };
 }
 
 export interface PostContext {
   addPost: (caption: String, images: String) => void;
   removePost: (id: String) => void;
-  likePost: (postId: String) => void;
-  dislike: (likeId: number) => void;
-  // followUser: (followerId: string, userId: string) => void;
-  addComment: (postId: String, reply: String) => void;
+  addRemoveLike: (postId: String) => void;
+  addTagUser: (tagData: ITag) => void;
 }
 
 const PostContext = createContext({} as PostContext);
@@ -28,83 +29,69 @@ const PostContext = createContext({} as PostContext);
 export const PostContextProvider: React.FC<PostContextProps> = ({
   children,
 }) => {
-  const [userData] = useSessionStorage("userData", "");
+  const [userData] = useLocalStorage("userData", "");
+  const [postLiked, setPostLiked] = useState<boolean>(false);
 
   const router = useRouter();
 
-  const addPost = (caption: String, images: String) => {
+  const addPost = (content: String, mediaFile: String) => {
     const postData = {
-      caption,
-      images,
-      authorEmail: userData.email,
+      content,
+      mediaFile,
+      email: userData.email,
     };
-
     axios
-      .post("http://localhost:3000/posts", postData)
+      .post("http://localhost:3000/api/posts", postData, {
+        withCredentials: true,
+      })
       .then((res) => {
         console.log(res.data);
-        router.replace("/");
       })
       .catch((err) => {
         toast.error("Failed Upload Image");
-        router.reload();
       });
   };
 
   const removePost = (id: String) => {
     axios
-      .delete(`http://localhost:3000/posts/${id}`)
+      .delete(`http://localhost:3000/api/posts/${id}`)
       .then((res) => {
         router.push(`/user/${userData.name}`);
       })
       .catch((err) => console.log(err));
   };
 
-  const likePost = (postId: String) => {
+  const addRemoveLike = (postId: String) => {
     const like = {
       postId,
       userId: userData.id,
-      isLiked: true,
-    };
-    axios.post(`http://localhost:3000/posts/like`, like).then((res) => {
-      toast.success(`Like post  successfully`, {
-        position: "top-center",
-      });
-    });
-  };
-
-  const dislike = (likeId: number) => {
-    axios
-      .delete(`http://localhost:3000/posts/like/${likeId}`)
-      .then((res) => {})
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const addComment = (postId: String, reply: String) => {
-    const commentData = {
-      postId,
-      reply,
     };
     axios
-      .post(`http://localhost:3000/posts/comment`, commentData)
+      .patch<IAddRemoveLike>(
+        `http://localhost:3000/api/posts/${postId}/add_remove_like`,
+        like,
+        {
+          withCredentials: true,
+        }
+      )
       .then((res) => {
-        toast.success(`Comment added successfully, refresh page`),
-          {
-            position: "top-center",
-            duration: 4000,
-          };
-        console.log(res.data);
+        console.log(res);
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => {});
+  };
+
+  const addTagUser = (tagData: ITag) => {
+    axios
+      .post(`http://localhost:3000/api/posts/add_tag`, tagData, {
+        withCredentials: true,
+      })
+      .then((res) => console.log(res))
+      .catch((err) => console.error(err));
   };
 
   return (
     <PostContext.Provider
-      value={{ addPost, removePost, likePost, dislike, addComment }}
+      value={{ addPost, removePost, addRemoveLike, addTagUser }}
     >
       {children}
     </PostContext.Provider>

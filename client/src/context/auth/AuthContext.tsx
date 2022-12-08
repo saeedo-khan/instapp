@@ -1,7 +1,19 @@
 import axios, { AxiosRequestHeaders } from "axios";
 import { useRouter } from "next/router";
 import React, { createContext, useContext, useState } from "react";
-import { useSessionStorage } from "../../hooks/useSessionStorage";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+
+interface ILogin {
+  type: string;
+  message: string;
+  data: {
+    existingUser: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  };
+}
 
 interface AuthContextProps {
   children: React.ReactNode;
@@ -20,7 +32,8 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
-  const [user, setUser] = useSessionStorage("userData", "");
+  // const [user, setUser] = useSessionStorage("userData", "");
+  const [user, setUser] = useLocalStorage("userData", "");
 
   const login = (email: string, password: string) => {
     setLoading(true);
@@ -31,37 +44,36 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
 
     try {
       axios
-        .post("http://localhost:3000/login", loginData, {
+        .post<ILogin>("http://localhost:3000/api/auth/login", loginData, {
           withCredentials: true,
         })
         .then((res) => {
-          const { name, id, token, thumbUrl } = res.data.existingUser;
+          const { name, id, email } = res.data.data.existingUser;
+          console.log(res);
           const userData = {
-            id: id,
-            name: name,
-            email: email,
-            thumbUrl: thumbUrl,
+            id,
+            name,
+            email,
           };
-          localStorage.setItem("token", token);
           setUser(userData);
           setLoading(false);
-          router.replace("/suggest_users");
+          router.push("/");
         });
     } catch (err) {
       setLoading(false);
-      console.log(err);
+      router.reload();
     }
   };
 
   const signUp = (name: string, email: string, password: string) => {
     setLoading(true);
     const signupData = {
-      name,
+      name: name.split(" ").join("_"),
       email,
       password,
     };
     axios
-      .post("http://localhost:3000/signup", signupData, {
+      .post("http://localhost:3000/api/auth/signup", signupData, {
         withCredentials: true,
       })
       .then((res) => {
@@ -72,14 +84,12 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
 
   const logOut = () => {
     axios
-      .get("http://localhost:3000/logout", {
+      .get("http://localhost:3000/api/auth/logout", {
         withCredentials: true,
-        headers: { "x-access-token": `${localStorage.getItem("token")}` },
       })
       .then((res) => {
         localStorage.clear();
         router.replace("/auth/login");
-        sessionStorage.clear();
       })
       .catch((err) => {
         localStorage.clear();
