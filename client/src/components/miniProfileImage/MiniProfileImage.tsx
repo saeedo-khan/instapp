@@ -57,8 +57,8 @@ const MiniProfileImage: React.FC<MiniProfileImageProps> = ({ post }) => {
         <Box className={classes.post_content}>
           <Box className={classes.overlayEffect}></Box>
           <Image
-            src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post.images[0]}`}
-            alt={`${post.caption}`}
+            src={`${post.media[0].mediaFile}`}
+            alt={`${post.content}`}
             layout="fill"
             objectFit="cover"
           />

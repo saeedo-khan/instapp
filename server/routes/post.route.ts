@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.get("/my_posts", fetchMyPosts);
 router.get("/all_posts", fetchPosts);
-router.get("/:postId", fetchPostDetails)
+router.get("/:userId", fetchPostDetails)
 // router.get("/following", fetchFollowingPosts)
 // router.get("/trending", fetchTrendingPosts);
 router.post("/" ,createPost);

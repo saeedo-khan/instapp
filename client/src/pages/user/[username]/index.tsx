@@ -16,12 +16,29 @@ import MiniProfileImage from "../../../components/miniProfileImage/MiniProfileIm
 import useUsers from "../../../context/users/UsersContext";
 import Meta from "../../../components/Meta";
 import { Toaster } from "react-hot-toast";
-import { IFollower } from "../../../interfaces/types";
 import Link from "next/link";
 import WithAuth from "../../../HOCs/WithAuth";
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
+import {
+  IFollower,
+  IPost,
+  IUser,
+  PostAudienceEnum,
+} from "../../../interfaces/types";
+import useSWR from "swr";
+import { useRouter } from "next/router";
 
 interface profileProps {}
+
+export interface Post {
+  type: string;
+  message: string;
+  data: Data;
+}
+
+interface Data {
+  posts: IPost[];
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -150,41 +167,18 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const res = await axios.get("http://localhost:3000/api/users");
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-  const paths = res.data.data.users.map((user: any) => {
-    return {
-      params: {
-        username: user.name.toString(),
-      },
-    };
-  });
-
-  return {
-    paths,
-    fallback: false,
-  };
-};
-
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  console.log(params);
-  const res = await axios.get(
-    `http://localhost:3000/api/users/${params?.username}`
+const Profile: React.FC<profileProps> = () => {
+  const router = useRouter();
+  const { data } = useSWR<Post, any[]>(
+    `http://localhost:3000/api/users/${router.query.username}/posts`,
+    fetcher
   );
 
-  return {
-    props: {
-      instaUser: res.data,
-    },
-  };
-};
-
-const Profile: React.FC<profileProps> = ({
-  instaUser,
-}: InferGetStaticPropsType<typeof getStaticProps>) => {
+  console.log(data?.data.posts);
   Meta.defaultProps = {
-    title: `instapp | ${instaUser.name}`,
+    title: `instapp | ${data?.data.posts[0].author.name}`,
     keywords: "socail media, interactive with people",
     description: "interactive with people from around the world",
   };
@@ -196,26 +190,30 @@ const Profile: React.FC<profileProps> = ({
 
   const [userData] = useLocalStorage("userData", "");
 
-  const handleFollow = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    followUser(instaUser.id);
-    setFollowed(true);
-  };
+  // const handleFollow = (e: React.MouseEvent<HTMLButtonElement>) => {
+  //   e.preventDefault();
+  //   followUser(currentUser.id);
+  //   setFollowed(true);
+  // };
 
-  const handleUnfollow = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  // const handleUnfollow = (e: React.MouseEvent<HTMLButtonElement>) => {
+  //   e.preventDefault();
 
-    // check if follow the user
-    const checkFollower = instaUser.followers.find(
-      (follower: IFollower) => follower.followerId
-    );
+  //   // check if follow the user
+  //   const checkFollower = currentUser.followers.find(
+  //     (follower: IFollower) => follower.followerId
+  //   );
 
-    if (checkFollower) {
-      unFollowUser(checkFollower.id);
-      setFollowed(false);
-    }
-  };
+  //   if (checkFollower) {
+  //     unFollowUser(checkFollower.id);
+  //     setFollowed(false);
+  //   }
+  // };
 
+  const getPublic = data?.data.posts.find(
+    (post) => post.audience == PostAudienceEnum.PUBLIC
+  );
+  console.log("pub", getPublic);
   return (
     <>
       <Toaster />
@@ -224,10 +222,12 @@ const Profile: React.FC<profileProps> = ({
           <Box className={classes.top_profile}>
             <Box className={classes.profile_img_wrap}>
               <Image
-                src={`${instaUser.profile_pic_url}`}
-                layout="fill"
+                src={`${data?.data.posts[0].author.profile_pic_url}`}
+                layout="responsive"
                 objectFit="cover"
                 objectPosition="center"
+                width={400}
+                height={400}
                 className={classes.thumb_profile}
               />
             </Box>
@@ -235,10 +235,12 @@ const Profile: React.FC<profileProps> = ({
             <Box display="flex">
               <Box display="flex" alignItems="center" justifyContent="center">
                 <Typography className={classes.profile_username}>
-                  {instaUser.name}
+                  {data?.data.posts[0].author.name}
                 </Typography>
-                {instaUser.id === userData.id ? (
-                  <Link href={`/user/${instaUser.name}/settings`}>
+                {data?.data.posts[0].authorId === userData.id ? (
+                  <Link
+                    href={`/user/${data?.data.posts[0].author.name}/settings`}
+                  >
                     <IconButton size="large">
                       <RiSettings3Line />
                     </IconButton>
@@ -247,17 +249,17 @@ const Profile: React.FC<profileProps> = ({
               </Box>
 
               <Box>
-                {userData.name !== instaUser.name && (
+                {userData.name !== router.query.username && (
                   <Button
                     variant="contained"
                     className={classes.edit_btn}
                     fullWidth
                   >
-                    {!followed ? (
+                    {/* {!followed ? (
                       <Typography onClick={handleUnfollow}>unfollow</Typography>
                     ) : (
                       <Typography onClick={handleFollow}>Follow</Typography>
-                    )}
+                    )} */}
                   </Button>
                 )}
               </Box>
@@ -265,7 +267,11 @@ const Profile: React.FC<profileProps> = ({
           </Box>
 
           <Box className={classes.bio}>
-            <Box>{instaUser.biography ? instaUser.biography : ""}</Box>
+            <Box>
+              {data?.data.posts[0].author.biography
+                ? data?.data.posts[0].author.biography
+                : ""}
+            </Box>
           </Box>
         </Box>
 
@@ -275,15 +281,17 @@ const Profile: React.FC<profileProps> = ({
         <Box className={classes.stats}>
           <Grid container className={classes.stats_profile}>
             <Grid item xs={4}>
-              <Box className={classes.count_stats}>
-                {instaUser.writtenPosts ? instaUser.writtenPosts.length : "0"}
-              </Box>
+              {/* <Box className={classes.count_stats}>
+                {currentUser.writtenPosts
+                  ? currentUser.writtenPosts.length
+                  : "0"}
+              </Box> */}
               <Typography className={classes.stats_text}>post</Typography>
             </Grid>
             <Grid item xs={4}>
               <Box className={classes.wrap_stats}>
                 <Box className={classes.stats}>
-                  {instaUser.followers.length}
+                  {/* {currentUser.followers.length} */}
                 </Box>
                 <Typography className={classes.stats_text}>
                   followers
@@ -293,7 +301,7 @@ const Profile: React.FC<profileProps> = ({
             <Grid item xs={4}>
               <Box className={classes.wrap_stats}>
                 <Box className={classes.stats}>
-                  {instaUser.following.length}
+                  {/* {currentUser.following.length} */}
                 </Box>
                 <Typography className={classes.stats_text}>follwing</Typography>
               </Box>
@@ -306,8 +314,8 @@ const Profile: React.FC<profileProps> = ({
         {/* posts */}
         <Box className={classes.posts_contain}>
           <Grid container>
-            {instaUser.writtenPosts ? (
-              instaUser.writtenPosts.map((post: any) => (
+            {data?.data.posts ? (
+              data?.data.posts.map((post) => (
                 <MiniProfileImage post={post} key={post.id} />
               ))
             ) : (
@@ -328,4 +336,4 @@ const Profile: React.FC<profileProps> = ({
   );
 };
 
-export default WithAuth(Profile);
+export default Profile;

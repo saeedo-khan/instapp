@@ -5,9 +5,13 @@ import { db } from "../../utils/db";
 
 export const fetchMyPosts = async (req: Request, res: Response) => {
     try {
-        const userId = req.body.userId;
+        console.log(req.query)
+        const username = req.body.username;
+        const user = await db.user.findUnique({
+            where: { name: username}
+        })
         const posts = await db.post.findMany({
-            where : { id: userId },
+            where : { id: user?.id },
             orderBy : {
                 createdAt: "desc"
             },

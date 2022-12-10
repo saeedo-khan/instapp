@@ -166,13 +166,15 @@ const Post: React.FC<PostProps> = ({ post }) => {
                   alignItems="center"
                   flexBasis={"50%"}
                 >
-                  <Avatar
-                    src={`${post.author.profile_pic_url}`}
-                    alt="thumb"
-                    sx={{ width: 24, height: 24 }}
-                  >
-                    {post.author.name.charAt(0)}
-                  </Avatar>
+                  <Link href={`/user/$${post.author.name}`}>
+                    <Avatar
+                      src={`${post.author.profile_pic_url}`}
+                      alt="thumb"
+                      sx={{ width: 24, height: 24, cursor: "pointer" }}
+                    >
+                      {post.author.name.charAt(0)}
+                    </Avatar>
+                  </Link>
                   <Typography ml={1} fontSize={14}>
                     {userData.name}
                   </Typography>

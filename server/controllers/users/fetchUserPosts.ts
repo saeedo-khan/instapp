@@ -5,9 +5,14 @@ import { include } from "./_helper";
 
 export const fetchUserPosts = async (req:Request, res:Response) => {
     try {
+
+        const user = await db.user.findUnique({
+            where: { name: req.params.name}
+        })
+
         const posts = await db.post.findMany({
             where: {
-                authorId: req.params.userId
+                authorId: user?.id
             },
             include
         })

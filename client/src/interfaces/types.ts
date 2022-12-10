@@ -21,7 +21,7 @@ export interface IPost {
   id: string;
   content: string;
   media: IMedia[];
-  audience: UserGender;
+  audience: PostAudienceEnum;
   specificAudienceFriends: IUser[];
   taggedFriends: ITag[];
   published: boolean;
@@ -66,7 +66,7 @@ enum UserGender {
   FEMALE,
 }
 
-enum PostAudienceEnum {
+export enum PostAudienceEnum {
   PUBLIC,
   FRIENDS,
   ONLY_ME,

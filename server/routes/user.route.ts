@@ -13,7 +13,7 @@ import { uploadProfilePic } from '../controllers/users/uploadProfilePic';
 
 const router = express.Router();
 
-router.get("/:userId/posts", fetchUserPosts)
+router.get("/:name/posts", fetchUserPosts)
 router.get("/:userId/all_following", fetchFollowings)
 router.get("/:name", fetchUserDetails)
 router.get("/suggest_users/:userId", suggestUsers)

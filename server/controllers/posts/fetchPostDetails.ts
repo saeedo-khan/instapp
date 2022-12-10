@@ -4,9 +4,10 @@ import { db } from "../../utils/db";
 
 export const fetchPostDetails = async (req: Request, res:Response, next:NextFunction) => {
     try {
-        const post = await db.post.findUnique({
+
+        const post = await db.post.findMany({
             where: {
-                id: req.params.postId
+                id: req.params.userId
             },
             include: {
                 author: {
@@ -56,11 +57,6 @@ export const fetchPostDetails = async (req: Request, res:Response, next:NextFunc
                 }
             }
         });
-
-        if(!post){
-            return next({ status: 404, message: 'No post found' });
-        };
-
         return res.json({
             type: "success",
             message: "fetch post details",
@@ -68,6 +64,7 @@ export const fetchPostDetails = async (req: Request, res:Response, next:NextFunc
                 post
             }
         })
+
     } catch (error) {
         next(error);
     }
