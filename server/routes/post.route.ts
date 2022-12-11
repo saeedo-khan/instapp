@@ -14,11 +14,8 @@ const router = express.Router();
 router.get("/my_posts", fetchMyPosts);
 router.get("/all_posts", fetchPosts);
 router.get("/:userId", fetchPostDetails)
-// router.get("/following", fetchFollowingPosts)
-// router.get("/trending", fetchTrendingPosts);
 router.post("/" ,createPost);
 router.delete("/:postId", deletePost);
-
 router.post("/add_tag", tagUser);
 router.patch("/:postId/add_remove_like", addRemoveLike);
 

@@ -15,6 +15,7 @@ export interface IUser {
   postComments: IComment[];
   createdAt: Date;
   updatedAt: Date;
+  _count?: ICount;
 }
 
 export interface IPost {
@@ -52,6 +53,7 @@ export interface IComment {
   id: string;
   content: string;
   createdAt: Date;
+  User: IUser;
 }
 
 export interface IFollower {
@@ -59,6 +61,12 @@ export interface IFollower {
   followerId: string;
   userId: string;
   createdAt: Date;
+}
+
+interface ICount {
+  followers:    number;
+  following:    number;
+  writtenPosts: number;
 }
 
 enum UserGender {

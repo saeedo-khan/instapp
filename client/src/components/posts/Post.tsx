@@ -66,7 +66,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
   const [expandComment, setExpandComment] = useState<boolean>(false);
   const [expanded, setExpanded] = React.useState(false);
-  const [comment, setComment] = useState<string>("");
+  const [content, setContent] = useState<string>("");
 
   const [userData] = useLocalStorage("userData", "");
 
@@ -76,13 +76,13 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
   const handleSubmit = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.preventDefault();
-    addComment(post.id, comment);
-    setComment("");
+    addComment(post.id, content);
+    setContent("");
   };
 
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
-  const check = post.likes.find((like) => like.id === userData.id);
+  const checkLike = post.likes.some((like) => like.id === userData.id);
 
   return (
     <Box className={classes.wrap_post}>
@@ -119,16 +119,10 @@ const Post: React.FC<PostProps> = ({ post }) => {
             {...label}
             icon={<FavoriteBorder />}
             checkedIcon={<Favorite sx={{ color: red[400] }} />}
-            checked={check ? true : false}
+            checked={checkLike}
             onClick={() => addRemoveLike(post.id)}
           />
 
-          <IconButton
-            aria-label="add to favorites"
-            onClick={() => setExpandComment(!expandComment)}
-          >
-            <CommentIcon />
-          </IconButton>
           {post.comments?.length !== 0 ? (
             <ExpandMore
               expand={expanded}
@@ -150,7 +144,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
           className={classes.collapse}
         >
           <Divider />
-          {post.comments?.map((comment) => (
+          {post.comments.map((comment) => (
             <Stack
               direction="column"
               justifyContent={"center"}
@@ -166,17 +160,17 @@ const Post: React.FC<PostProps> = ({ post }) => {
                   alignItems="center"
                   flexBasis={"50%"}
                 >
-                  <Link href={`/user/$${post.author.name}`}>
+                  <Link href={`/user/${comment.User.name}`}>
                     <Avatar
-                      src={`${post.author.profile_pic_url}`}
+                      src={`${comment.User.profile_pic_url}`}
                       alt="thumb"
                       sx={{ width: 24, height: 24, cursor: "pointer" }}
                     >
-                      {post.author.name.charAt(0)}
+                      {comment.User.name.charAt(0)}
                     </Avatar>
                   </Link>
                   <Typography ml={1} fontSize={14}>
-                    {userData.name}
+                    {comment.User.name}
                   </Typography>
                 </Box>
                 <Box flexBasis={"45%"} display="flex" justifyContent="flex-end">
@@ -200,8 +194,8 @@ const Post: React.FC<PostProps> = ({ post }) => {
               name="comment"
               placeholder="Write comment .."
               fullWidth
-              onChange={(e) => setComment(e.target.value)}
-              value={comment}
+              onChange={(e) => setContent(e.target.value)}
+              value={content}
             />
           </Box>
           <Box>

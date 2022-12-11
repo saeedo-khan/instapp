@@ -23,8 +23,8 @@ import { createStyles, makeStyles } from "@material-ui/core";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { IPost } from "../../interfaces/types";
 import { convertDate } from "../../../utils/convertDate";
-import usePost from "../../context/post/PostContext";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import useComments from "../../context/comments/CommentsContext";
 
 interface ProfilePostProps {
   post: IPost | undefined;
@@ -106,12 +106,12 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post }) => {
   };
 
   const handleComment = () => {
-    addComment(post?.id, comment);
+    addComment({ postId: post?.id, content: comment });
     handleExpandClick();
     setComment("");
   };
 
-  const { addComment } = usePost();
+  const { addComment } = useComments();
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -143,7 +143,7 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post }) => {
             <Box ml={1}>
               <Link href={`/user/${post?.author.name}`} passHref>
                 <Avatar
-                  src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post?.author.profile_pic_url}`}
+                  src={`${post?.author.profile_pic_url}`}
                   sx={{ cursor: "pointer" }}
                 >
                   {post?.author.name.charAt(0)}
@@ -154,8 +154,8 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post }) => {
           </Stack>
           <Box className={classes.imgWrap}>
             <Image
-              src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post?.images[0]}`}
-              alt={`${post?.caption}`}
+              src={`${post?.media[0].mediaFile}`}
+              alt={`${post?.content}`}
               layout="fill"
               objectFit="cover"
             />
@@ -218,14 +218,11 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post }) => {
                     alignItems="center"
                     flexBasis={"50%"}
                   >
-                    <Avatar
-                      src={`https://res.cloudinary.com/dgpppa0f1/image/upload/v1661726614/${post.author.profile_pic_url}`}
-                      alt="thumb"
-                    >
-                      {userData.name?.charAt(0)}
+                    <Avatar src={`${comment.User.profile_pic_url}`} alt="thumb">
+                      {comment.User.name?.charAt(0)}
                     </Avatar>
                     <Typography ml={1} fontSize={14}>
-                      {userData.name}
+                      {comment.User.name}
                     </Typography>
                   </Box>
                   <Box
@@ -239,7 +236,7 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post }) => {
                 </Box>
                 <Box maxWidth={"95%"}>
                   <Typography ml={5} fontSize={14}>
-                    {comment.reply}
+                    {comment.content}
                   </Typography>
                   <IconButton>
                     <DeleteIcon />

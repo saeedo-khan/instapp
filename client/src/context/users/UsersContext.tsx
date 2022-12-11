@@ -12,8 +12,7 @@ interface IUsersData {
   uploadProfilePic: ({ pic, userId }: { pic: string; userId: string }) => void;
   deleteUser: () => void;
   changePassword: (currentPass: string, newPass: string) => void;
-  followUser: (followerId: string) => void;
-  unFollowUser: (followerId: string) => void;
+  addRmoveFollow: (followerId: string | undefined) => void;
 }
 
 interface IUpdateUsers {
@@ -105,33 +104,16 @@ export const UsersContextProvider: React.FC<UsersContextProps> = ({
       .catch((err) => console.error(err));
   };
 
-  const followUser = (followerId: string) => {
-    const data = {
-      userId: userData.id,
-      followerId,
-      isFollower: true,
-    };
+  const addRmoveFollow = (followerId: string | undefined) => {
     axios
-      .post("http://localhost:3000/users/follow", data)
+      .patch(
+        `http://localhost:3000/api/users/${followerId}/add_remove_follow`,
+        {
+          userId: userData.id,
+        }
+      )
       .then((res) => {
         toast.success(`you started follow `, {
-          position: "top-center",
-          duration: 4000,
-        });
-      })
-      .catch((err) => {
-        toast.error(`failed ${err}`, {
-          position: "top-center",
-          duration: 4000,
-        });
-      });
-  };
-
-  const unFollowUser = (followerId: string) => {
-    axios
-      .delete(`http://localhost:3000/users/follow/${followerId}`)
-      .then((res) => {
-        toast.success(`unfollow user `, {
           position: "top-center",
           duration: 4000,
         });
@@ -147,8 +129,7 @@ export const UsersContextProvider: React.FC<UsersContextProps> = ({
   return (
     <UserContext.Provider
       value={{
-        followUser,
-        unFollowUser,
+        addRmoveFollow,
         updateUserData,
         uploadProfilePic,
         deleteUser,

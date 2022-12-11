@@ -78,7 +78,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
       })
       .then((res) => {
         setLoading(false);
-        router.push("/");
+        router.push("/auth/login");
       });
   };
 

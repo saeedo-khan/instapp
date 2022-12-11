@@ -10,6 +10,11 @@ export const fetchPostDetails = async (req: Request, res:Response, next:NextFunc
                 id: req.params.userId
             },
             include: {
+                media: {
+                    select:{
+                        mediaFile: true,
+                    }
+                },
                 author: {
                     select: {
                         name: true,
@@ -26,6 +31,7 @@ export const fetchPostDetails = async (req: Request, res:Response, next:NextFunc
                 },
                 comments: {
                     select: {
+                        id: true,
                         content: true,
                         User: {
                             select: {

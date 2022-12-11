@@ -17,15 +17,30 @@ export const fetchUserDetails = async (req:Request, res:Response) => {
                 createdAt: true,
                 _count: {
                     select: {
-                        followers: true
+                        followers: true,
+                        following: true,
+                        writtenPosts: true,
                     }
                 },
                 following: {
-                    take: 3,
                     select: {
                         id: true,
                     }
+                },
+                followers: {
+                    select: {
+                        id: true,
+                    }
+                },
+                writtenPosts: {
+                    select:{
+                        id: true,
+                        media: true,
+                        content: true,
+                        authorId: true,
+                    }
                 }
+                
             }
         });
         return res.status(200).json({

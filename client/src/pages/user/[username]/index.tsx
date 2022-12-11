@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Box,
@@ -11,7 +11,6 @@ import {
 import { Theme, IconButton } from "@mui/material";
 import { RiSettings3Line } from "react-icons/ri";
 import axios from "axios";
-import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
 import MiniProfileImage from "../../../components/miniProfileImage/MiniProfileImage";
 import useUsers from "../../../context/users/UsersContext";
 import Meta from "../../../components/Meta";
@@ -19,13 +18,8 @@ import { Toaster } from "react-hot-toast";
 import Link from "next/link";
 import WithAuth from "../../../HOCs/WithAuth";
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
-import {
-  IFollower,
-  IPost,
-  IUser,
-  PostAudienceEnum,
-} from "../../../interfaces/types";
-import useSWR from "swr";
+import { IFollower, IPost, IUser } from "../../../interfaces/types";
+import useSWR, { SWRConfig } from "swr";
 import { useRouter } from "next/router";
 
 interface profileProps {}
@@ -37,7 +31,7 @@ export interface Post {
 }
 
 interface Data {
-  posts: IPost[];
+  user: IUser;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -167,53 +161,53 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+export const fetcher = async <T = any,>(url: string) => {
+  const { data } = await axios.get<T>(url);
+  return data;
+};
+
+export const fetch = async (url: string) => {
+  try {
+    const res = await axios.get(url);
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const Profile: React.FC<profileProps> = () => {
   const router = useRouter();
-  const { data } = useSWR<Post, any[]>(
-    `http://localhost:3000/api/users/${router.query.username}/posts`,
+
+  const { data, error } = useSWR<Post, any[]>(
+    `http://localhost:3000/api/users/${router.query.username}`,
     fetcher
   );
 
-  console.log(data?.data.posts);
   Meta.defaultProps = {
-    title: `instapp | ${data?.data.posts[0].author.name}`,
+    title: `instapp | ${router.query.username}`,
     keywords: "socail media, interactive with people",
     description: "interactive with people from around the world",
   };
 
   const classes = useStyles();
 
-  const { followUser, unFollowUser } = useUsers();
-  const [followed, setFollowed] = React.useState<boolean>(false);
+  const { addRmoveFollow } = useUsers();
 
   const [userData] = useLocalStorage("userData", "");
 
-  // const handleFollow = (e: React.MouseEvent<HTMLButtonElement>) => {
-  //   e.preventDefault();
-  //   followUser(currentUser.id);
-  //   setFollowed(true);
-  // };
+  const handleFollow = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    addRmoveFollow(data?.data.user.id);
+  };
 
-  // const handleUnfollow = (e: React.MouseEvent<HTMLButtonElement>) => {
-  //   e.preventDefault();
+  // const getPublic = data?.data.posts.find(
+  //   (post) => post.audience == PostAudienceEnum.PUBLIC
+  // );
+  // console.log("pub", getPublic);
 
-  //   // check if follow the user
-  //   const checkFollower = currentUser.followers.find(
-  //     (follower: IFollower) => follower.followerId
-  //   );
+  if (error) return <div>failed to load</div>;
+  if (!data) return <div>loading...</div>;
 
-  //   if (checkFollower) {
-  //     unFollowUser(checkFollower.id);
-  //     setFollowed(false);
-  //   }
-  // };
-
-  const getPublic = data?.data.posts.find(
-    (post) => post.audience == PostAudienceEnum.PUBLIC
-  );
-  console.log("pub", getPublic);
   return (
     <>
       <Toaster />
@@ -222,7 +216,7 @@ const Profile: React.FC<profileProps> = () => {
           <Box className={classes.top_profile}>
             <Box className={classes.profile_img_wrap}>
               <Image
-                src={`${data?.data.posts[0].author.profile_pic_url}`}
+                src={`${data?.data.user.profile_pic_url}`}
                 layout="responsive"
                 objectFit="cover"
                 objectPosition="center"
@@ -235,12 +229,10 @@ const Profile: React.FC<profileProps> = () => {
             <Box display="flex">
               <Box display="flex" alignItems="center" justifyContent="center">
                 <Typography className={classes.profile_username}>
-                  {data?.data.posts[0].author.name}
+                  {data?.data.user.name}
                 </Typography>
-                {data?.data.posts[0].authorId === userData.id ? (
-                  <Link
-                    href={`/user/${data?.data.posts[0].author.name}/settings`}
-                  >
+                {data?.data.user.id === userData.id ? (
+                  <Link href={`/user/${data?.data.user.name}/settings`}>
                     <IconButton size="large">
                       <RiSettings3Line />
                     </IconButton>
@@ -254,12 +246,15 @@ const Profile: React.FC<profileProps> = () => {
                     variant="contained"
                     className={classes.edit_btn}
                     fullWidth
+                    onClick={handleFollow}
                   >
-                    {/* {!followed ? (
-                      <Typography onClick={handleUnfollow}>unfollow</Typography>
+                    {data?.data.user.followers.some(
+                      (user) => user.id === userData.id
+                    ) ? (
+                      <Typography>unfollow</Typography>
                     ) : (
-                      <Typography onClick={handleFollow}>Follow</Typography>
-                    )} */}
+                      <Typography>Follow</Typography>
+                    )}
                   </Button>
                 )}
               </Box>
@@ -268,9 +263,7 @@ const Profile: React.FC<profileProps> = () => {
 
           <Box className={classes.bio}>
             <Box>
-              {data?.data.posts[0].author.biography
-                ? data?.data.posts[0].author.biography
-                : ""}
+              {data?.data.user.biography ? data?.data.user.biography : ""}
             </Box>
           </Box>
         </Box>
@@ -281,17 +274,15 @@ const Profile: React.FC<profileProps> = () => {
         <Box className={classes.stats}>
           <Grid container className={classes.stats_profile}>
             <Grid item xs={4}>
-              {/* <Box className={classes.count_stats}>
-                {currentUser.writtenPosts
-                  ? currentUser.writtenPosts.length
-                  : "0"}
-              </Box> */}
+              <Box className={classes.count_stats}>
+                {data?.data.user._count?.writtenPosts}
+              </Box>
               <Typography className={classes.stats_text}>post</Typography>
             </Grid>
             <Grid item xs={4}>
               <Box className={classes.wrap_stats}>
                 <Box className={classes.stats}>
-                  {/* {currentUser.followers.length} */}
+                  {data?.data.user._count?.followers}
                 </Box>
                 <Typography className={classes.stats_text}>
                   followers
@@ -301,7 +292,7 @@ const Profile: React.FC<profileProps> = () => {
             <Grid item xs={4}>
               <Box className={classes.wrap_stats}>
                 <Box className={classes.stats}>
-                  {/* {currentUser.following.length} */}
+                  {data?.data.user._count?.following}
                 </Box>
                 <Typography className={classes.stats_text}>follwing</Typography>
               </Box>
@@ -314,8 +305,8 @@ const Profile: React.FC<profileProps> = () => {
         {/* posts */}
         <Box className={classes.posts_contain}>
           <Grid container>
-            {data?.data.posts ? (
-              data?.data.posts.map((post) => (
+            {data?.data.user.writtenPosts ? (
+              data?.data.user.writtenPosts.map((post) => (
                 <MiniProfileImage post={post} key={post.id} />
               ))
             ) : (

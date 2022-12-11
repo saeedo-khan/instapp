@@ -7,7 +7,7 @@ interface CommentsContextProps {
 }
 
 interface ICommentContext {
-  addComment: (postId: String, reply: String) => void;
+  addComment: (postId: string, content: string) => void;
   deleteComment: (commentId: string) => void;
   fetchComment: (postId: string) => void;
 }
@@ -19,16 +19,14 @@ export const CommentsProvider: React.FC<CommentsContextProps> = ({
 }) => {
   const [userData] = useLocalStorage("userData", "");
 
-  const addComment = (postId: String, content: String) => {
+  const addComment = (postId: string, content: string) => {
+    console.log(userData.id);
     const commentData = {
       content,
       userId: userData.id,
     };
-
     axios
-      .post(`http://localhost:3000/api/comments/${postId}`, commentData, {
-        withCredentials: true,
-      })
+      .post(`http://localhost:3000/api/comments/${postId}`, commentData)
       .then((res) => console.log(res))
       .catch((err) => {
         console.log(err);

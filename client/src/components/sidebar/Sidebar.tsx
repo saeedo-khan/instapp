@@ -14,7 +14,9 @@ import React from "react";
 import useSWR from "swr";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { RiUserFill } from "react-icons/ri";
+import { TiUserAdd } from "react-icons/ti";
 import WithAuth from "../../HOCs/WithAuth";
+import useUsers from "../../context/users/UsersContext";
 
 interface suggestionProps {
   type: string;
@@ -30,6 +32,7 @@ interface Suggestion {
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Sidebar = () => {
+  const { addRmoveFollow } = useUsers();
   const [userData] = useLocalStorage("userData", "");
   const { data, error } = useSWR<suggestionProps, any>(
     `http://localhost:3000/api/users/suggest_users/${userData.id}`,
@@ -44,8 +47,13 @@ const Sidebar = () => {
           <ListItem
             key={user.id}
             secondaryAction={
-              <IconButton edge="end" aria-label="follow">
-                <RiUserFill />
+              <IconButton
+                edge="end"
+                aria-label="follow"
+                size="medium"
+                onClick={() => addRmoveFollow(user.id)}
+              >
+                <TiUserAdd />
               </IconButton>
             }
           >

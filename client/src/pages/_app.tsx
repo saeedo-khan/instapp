@@ -12,6 +12,7 @@ import { UsersContextProvider } from "../context/users/UsersContext";
 import PageProvider from "../PageProvider";
 import { ThemeProvider } from "next-themes";
 import { GlobalStyles } from "@mui/material";
+import { CommentsProvider } from "../context/comments/CommentsContext";
 
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
@@ -54,20 +55,22 @@ const MyApp: React.FC<MyAppProps> = (props) => {
           <AuthContextProvider>
             <PostContextProvider>
               <UsersContextProvider>
-                {loadng ? (
-                  <Layout>
-                    <Component {...pageProps} />
-                  </Layout>
-                ) : (
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    height="100vh"
-                  >
-                    <SyncLoader color="#42a1ca" />
-                  </Box>
-                )}
+                <CommentsProvider>
+                  {loadng ? (
+                    <Layout>
+                      <Component {...pageProps} />
+                    </Layout>
+                  ) : (
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      height="100vh"
+                    >
+                      <SyncLoader color="#42a1ca" />
+                    </Box>
+                  )}
+                </CommentsProvider>
               </UsersContextProvider>
             </PostContextProvider>
           </AuthContextProvider>
