@@ -28,6 +28,9 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       icons:{
         display: 'flex',
+        [theme.breakpoints.down("xs")]:{
+          margin: "0 auto"
+        }
       },
       searching:{
         width: '268px',
@@ -35,7 +38,10 @@ const useStyles = makeStyles((theme: Theme) =>
         height:'36px',
         borderRadius: '3px',
         marginLeft: 'auto',
-        marginRight: theme.spacing(2)
+        marginRight: theme.spacing(2),
+        [theme.breakpoints.down("xs")]:{
+          display: 'none'
+        }
       },
       container:{
         display: 'flex',

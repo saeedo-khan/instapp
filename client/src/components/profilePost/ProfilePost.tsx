@@ -106,9 +106,12 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post }) => {
   };
 
   const handleComment = () => {
-    addComment({ postId: post?.id, content: comment });
-    handleExpandClick();
-    setComment("");
+    const postId = post?.id;
+    if (postId) {
+      addComment(postId, comment);
+      handleExpandClick();
+      setComment("");
+    }
   };
 
   const { addComment } = useComments();
@@ -116,8 +119,6 @@ const ProfilePost: React.FC<ProfilePostProps> = ({ post }) => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
-  console.log(post);
 
   return (
     <>

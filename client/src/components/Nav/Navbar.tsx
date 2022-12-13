@@ -13,13 +13,15 @@ import {
 import { styled, alpha } from "@mui/material/styles";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import instaLogo from "../../assets/735145cfe0a4.png";
+import { IoInvertModeSharp, IoInvertModeOutline } from "react-icons/io5";
+import { useTheme as useNextTheme } from "next-themes";
 import SearchIcon from "@mui/icons-material/Search";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import useStyles from "./Nav.styles";
 import { useMediaQuery, useTheme } from "@material-ui/core";
 import NewPost from "../newPost/NewPost";
 import Image from "next/image";
-import { AccountCircle } from "@mui/icons-material";
+import { AccountCircle, Light } from "@mui/icons-material";
 import Link from "next/link";
 import useAuth from "../../context/auth/AuthContext";
 import { useRouter } from "next/router";
@@ -71,6 +73,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const Navbar = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [mode, setMode] = useState<"light" | "dark">("dark");
 
   const router = useRouter();
 
@@ -91,9 +94,16 @@ const Navbar = () => {
 
   const { logOut } = useAuth();
 
+  const { resolvedTheme, setTheme } = useNextTheme();
+
   const classes = useStyles(useStyles);
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
+
+  function changeTheme() {
+    setMode((prevMode) => (prevMode === "dark" ? "light" : "dark"));
+    setTheme(mode);
+  }
 
   return (
     <>
@@ -135,6 +145,14 @@ const Navbar = () => {
             </Box>
 
             <Box className={classes.icons}>
+              <IconButton size="medium" onClick={changeTheme}>
+                {mode === "dark" ? (
+                  <IoInvertModeSharp />
+                ) : (
+                  <IoInvertModeOutline />
+                )}
+              </IconButton>
+
               <Link href={"/"}>
                 <IconButton size="large">
                   <HomeOutlinedIcon sx={{ color: "rgba(255,255,255,0.5)" }} />

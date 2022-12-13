@@ -33,7 +33,6 @@ createStyles({
             width:500
         },
         [theme.breakpoints.down('xs')]:{
-            height: 300,
             width: '100vw'
         }
     },

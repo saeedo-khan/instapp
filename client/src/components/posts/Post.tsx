@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Avatar,
   Box,
@@ -15,9 +15,9 @@ import {
   styled,
   Checkbox,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
 import Favorite from "@mui/icons-material/Favorite";
-import CommentIcon from "@mui/icons-material/Comment";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ReplyIcon from "@mui/icons-material/Reply";
 
@@ -68,6 +68,8 @@ const Post: React.FC<PostProps> = ({ post }) => {
   const [expanded, setExpanded] = React.useState(false);
   const [content, setContent] = useState<string>("");
 
+  const theme = useTheme();
+
   const [userData] = useLocalStorage("userData", "");
 
   const handleExpandClick = async () => {
@@ -82,6 +84,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
 
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
+  // check if already likes
   const checkLike = post.likes.some((like) => like.id === userData.id);
 
   return (

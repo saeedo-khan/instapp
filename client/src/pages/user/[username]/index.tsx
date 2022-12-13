@@ -102,7 +102,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: 14,
       textTransform: "capitalize",
       fontFamily: "Roboto, sans-serif",
-      color: "white",
+      marginTop: theme.spacing(1),
       [theme.breakpoints.down("xs")]: {
         width: 140,
       },
@@ -157,6 +157,9 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("sm")]: {
         maxWidth: "780px",
       },
+    },
+    btn_following: {
+      color: "black",
     },
   })
 );
@@ -242,20 +245,29 @@ const Profile: React.FC<profileProps> = () => {
 
               <Box>
                 {userData.name !== router.query.username && (
-                  <Button
-                    variant="contained"
-                    className={classes.edit_btn}
-                    fullWidth
-                    onClick={handleFollow}
-                  >
+                  <>
                     {data?.data.user.followers.some(
                       (user) => user.id === userData.id
                     ) ? (
-                      <Typography>unfollow</Typography>
+                      <Button
+                        variant="contained"
+                        className={classes.edit_btn}
+                        fullWidth
+                        onClick={handleFollow}
+                      >
+                        unFollow
+                      </Button>
                     ) : (
-                      <Typography>Follow</Typography>
+                      <Button
+                        variant="contained"
+                        className={classes.edit_btn}
+                        fullWidth
+                        onClick={handleFollow}
+                      >
+                        Follow
+                      </Button>
                     )}
-                  </Button>
+                  </>
                 )}
               </Box>
             </Box>
