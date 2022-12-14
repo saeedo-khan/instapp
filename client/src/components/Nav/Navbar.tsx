@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Container,
@@ -9,6 +9,12 @@ import {
   Modal,
   Menu,
   MenuItem,
+  Avatar,
+  ListItem,
+  List,
+  ListItemButton,
+  ListItemAvatar,
+  ListItemText,
 } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -26,6 +32,8 @@ import Link from "next/link";
 import useAuth from "../../context/auth/AuthContext";
 import { useRouter } from "next/router";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import axios from "axios";
+import { IUser } from "../../interfaces/types";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -70,10 +78,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+type SearchUsers = { type: string; message: string; data: { users: IUser[] } };
+
 const Navbar = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mode, setMode] = useState<"light" | "dark">("dark");
+  const [searchingUsers, setSearchingUsers] = useState<IUser[]>();
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [showSearch, setShowSearch] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -94,7 +107,7 @@ const Navbar = () => {
 
   const { logOut } = useAuth();
 
-  const { resolvedTheme, setTheme } = useNextTheme();
+  const { setTheme } = useNextTheme();
 
   const classes = useStyles(useStyles);
   const theme = useTheme();
@@ -104,6 +117,26 @@ const Navbar = () => {
     setMode((prevMode) => (prevMode === "dark" ? "light" : "dark"));
     setTheme(mode);
   }
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setShowSearch(true);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
+    setShowSearch(false);
+  };
+
+  useEffect(() => {
+    const getSearchingResults = async () => {
+      const res = await axios.get(
+        `http://localhost:3000/api/search/?q=${searchQuery}`
+      );
+
+      setSearchingUsers(res.data.data.users);
+    };
+    getSearchingResults();
+  }, [searchQuery]);
 
   return (
     <>
@@ -140,8 +173,38 @@ const Navbar = () => {
                 <StyledInputBase
                   placeholder="Search…"
                   inputProps={{ "aria-label": "search" }}
+                  onChange={handleSearch}
+                  onBlur={handleBlur}
+                  value={searchQuery}
                 />
               </Search>
+              {showSearch && (
+                <List
+                  sx={{
+                    backgroundColor: "rgba(0, 0, 0, 0.9)",
+                    mt: 0.1,
+                    ml: 1,
+                  }}
+                >
+                  {searchingUsers?.map((user) => (
+                    <ListItem>
+                      <Link href={`/user/${user.name}`}>
+                        <ListItemButton>
+                          <ListItemAvatar>
+                            <Avatar
+                              sizes="small"
+                              src={`${user.profile_pic_url}`}
+                            >
+                              {user.name.charAt(0)}
+                            </Avatar>
+                          </ListItemAvatar>
+                          <ListItemText id="labelId" primary={user.name} />
+                        </ListItemButton>
+                      </Link>
+                    </ListItem>
+                  ))}
+                </List>
+              )}
             </Box>
 
             <Box className={classes.icons}>

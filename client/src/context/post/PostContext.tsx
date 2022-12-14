@@ -30,7 +30,6 @@ export const PostContextProvider: React.FC<PostContextProps> = ({
   children,
 }) => {
   const [userData] = useLocalStorage("userData", "");
-  const [postLiked, setPostLiked] = useState<boolean>(false);
 
   const router = useRouter();
 

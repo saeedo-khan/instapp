@@ -43,6 +43,11 @@ const useStyles = makeStyles((theme: Theme) =>
           display: 'none'
         }
       },
+      searchingResults:{
+        width: 255,
+        backgroundColor: "#cecece",
+        margin: '0 auto'
+      },
       container:{
         display: 'flex',
         alignItems: 'center',
