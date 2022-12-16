@@ -32,7 +32,8 @@ declare var process : {
         CLOUD_NAME: string;
         CLOUD_KEY: string;
         CLOUD_SECRET: string;
-        NODE_ENV: string
+        NODE_ENV: string;
+        port: string;
     }
 }
 
@@ -66,7 +67,8 @@ app.post('/upload_files', multerUplaod.single("post"), uploadFiels)
 app.delete("/api/:imageId", deletePostFile)
 // app.post('/upload_thumb', upload.single("thumb"), uploadFiels)
 
+const port = process.env.port || 3000
 
-app.listen(3000, () => {
+app.listen(port || 3000, () => {
     console.log('Server running in port 3000')
 })
