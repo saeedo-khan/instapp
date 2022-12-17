@@ -5,7 +5,6 @@ import multer from 'multer'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import { v4 as uuidv4 } from 'uuid';
 const cloudinary = require('cloudinary').v2;
 
 // routes
