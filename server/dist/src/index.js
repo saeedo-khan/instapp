@@ -82,7 +82,7 @@ var uploadFiels = function (req, res) { return __awaiter(void 0, void 0, void 0,
 app.post('/upload_files', multerUplaod.single("post"), uploadFiels);
 app["delete"]("/api/:imageId", deletePostImage_1.deletePostFile);
 // app.post('/upload_thumb', upload.single("thumb"), uploadFiels)
-var port = process.env.port || 3000;
+var port = process.env.PORT || 3000;
 app.listen(port || 3000, function () {
     console.log('Server running in port 3000');
 });

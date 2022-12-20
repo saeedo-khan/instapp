@@ -10,6 +10,7 @@ const cloudinary = require('cloudinary').v2;
 // routes
 import { registerRoutes } from "../routes"
 import { deletePostFile } from '../controllers/posts/deletePostImage'
+import { createUsers } from '../controllers/automation/user.automation'
 
 const corsConfig = {
     origin: true,
@@ -64,7 +65,12 @@ const uploadFiels = async (req:Request, res:Response) => {
 
 app.post('/upload_files', multerUplaod.single("post"), uploadFiels)
 app.delete("/api/:imageId", deletePostFile)
-// app.post('/upload_thumb', upload.single("thumb"), uploadFiels)
+
+app.get("/", async (req:Request, res:Response) => {
+    res.send("app running...")
+})
+
+createUsers(10)
 
 const port = process.env.PORT || 3000
 
