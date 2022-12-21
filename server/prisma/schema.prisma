@@ -76,15 +76,6 @@ model Comment {
   userId    String
 }
 
-// model Follower {
-//   id         String   @id @default(uuid())
-//   user       User     @relation(name: "UserFollowing", fields: [userId], references: [id], onDelete: Cascade)
-//   userId     String
-//   follower   User     @relation(name: "UserFollower", fields: [followerId], references: [id], onDelete: Cascade)
-//   followerId String
-//   createdAt  DateTime @default(now())
-// }
-
 enum UserGender {
   MALE
   FEMALE

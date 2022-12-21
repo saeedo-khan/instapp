@@ -1,6 +1,6 @@
 require("dotenv").config()
 
-import express, { NextFunction, Request, Response } from 'express'
+import express, { Request, Response } from 'express'
 import multer from 'multer'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
@@ -8,9 +8,9 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 const cloudinary = require('cloudinary').v2;
 
 // routes
-import { registerRoutes } from "../routes"
-import { deletePostFile } from '../controllers/posts/deletePostImage'
-import { createUsers } from '../controllers/automation/user.automation'
+import { registerRoutes } from "./routes"
+import { deletePostFile } from './controllers/posts/deletePostImage'
+import { createUsers } from './controllers/automation/user.automation'
 
 const corsConfig = {
     origin: true,
@@ -24,7 +24,7 @@ app.use(cors(corsConfig))
 app.use(express.static('upload'))
 app.use(cookieParser())
 
-// middleware
+// all routes
 registerRoutes(app)
 
 declare var process : {
@@ -74,6 +74,6 @@ createUsers(10)
 
 const port = process.env.PORT || 3000
 
-app.listen(port || 3000, () => {
-    console.log('Server running in port 3000')
+app.listen(port, () => {
+    console.log(`server listening on ${port}`)
 })
