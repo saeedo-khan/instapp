@@ -70,8 +70,6 @@ app.get("/", async (req:Request, res:Response) => {
     res.send("app running...")
 })
 
-createUsers(10)
-
 const port = process.env.PORT || 3000
 
 app.listen(port, () => {

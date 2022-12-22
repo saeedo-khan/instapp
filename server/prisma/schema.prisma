@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,41 +7,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// statusMessage
 model User {
-  id                      String     @id @default(uuid())
-  email                   String     @unique
-  name                    String     @unique
-  password                String?
-  token                   String?
-  writtenPosts            Post[]     @relation("writtenPosts")
-  profile_pic_url         String?
-  gender                  UserGender @default(MALE)
-  taggedInPosts           PostTag[]  @relation("_UsersPostsTag")
-  biography               String?
-  createdAt               DateTime   @default(now())
-  updatedAt               DateTime?  @updatedAt
-  specificAudienceInPosts Post[]     @relation("_UsersPostsSpecificAudince")
-  followers               User[]     @relation(name: "FollowRelation")
-  following               User[]     @relation(name: "FollowRelation")
-  likePosts               Post[]     @relation("UsersPostsLike")
-  postComments            Comment[]
+  id                             String     @id @default(uuid())
+  email                          String     @unique
+  name                           String     @unique
+  createdAt                      DateTime   @default(now())
+  updatedAt                      DateTime?  @updatedAt
+  password                       String?
+  token                          String?
+  biography                      String?
+  profile_pic_url                String?
+  gender                         UserGender @default(MALE)
+  postComments                   Comment[]
+  writtenPosts                   Post[]     @relation("writtenPosts")
+  User_B                         User[]     @relation("FollowRelation")
+  User_A                         User[]     @relation("FollowRelation")
+  likePosts                      Post[]     @relation("UsersPostsLike")
+  Post_UsersPostsSpecificAudince Post[]     @relation("UsersPostsSpecificAudince")
+  PostTag                        PostTag[]  @relation("UsersPostsTag")
 }
 
 model Post {
-  id                      String           @id @default(uuid())
-  content                 String?
-  audience                PostAudienceEnum @default(PUBLIC)
-  specificAudienceFriends User[]           @relation("_UsersPostsSpecificAudince")
-  media                   PostMedia[]
-  taggedFriends           PostTag[]
-  likes                   User[]           @relation("UsersPostsLike")
-  published               Boolean          @default(false)
-  createdAt               DateTime         @default(now())
-  updatedAt               DateTime         @updatedAt
-  author                  User             @relation("writtenPosts", fields: [authorId], references: [id], onDelete: Cascade)
-  authorId                String
-  comments                Comment[]
+  published                      Boolean          @default(false)
+  authorId                       String
+  createdAt                      DateTime         @default(now())
+  updatedAt                      DateTime         @updatedAt
+  id                             String           @id @default(uuid())
+  audience                       PostAudienceEnum @default(PUBLIC)
+  content                        String?
+  author                         User             @relation("writtenPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  comments                       Comment[]
+  media                          PostMedia[]
+  taggedFriends                  PostTag[]
+  likes                          User[]           @relation("UsersPostsLike")
+  User_UsersPostsSpecificAudince User[]           @relation("UsersPostsSpecificAudince")
 }
 
 model PostMedia {
@@ -53,27 +49,27 @@ model PostMedia {
   longitude Int?
   latitude  Int?
   position  MediaPosition @default(IMAGE)
-  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model PostTag {
   id            String  @id @default(uuid())
   x_coordinates Float
   y_coordinates Float
-  Post          Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId        String?
-  taggedUsers   User[]  @relation("_UsersPostsTag")
+  Post          Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  User          User[]  @relation("UsersPostsTag")
 }
 
 model Comment {
   id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
-  Post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+  Post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum UserGender {
