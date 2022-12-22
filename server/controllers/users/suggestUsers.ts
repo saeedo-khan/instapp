@@ -52,6 +52,6 @@ export const suggestUsers = async (req: Request, res: Response, next:NextFunctio
 
 
     } catch (error) {
-        next(error);
+        return res.status(404).json({ message: error })
     }
 };

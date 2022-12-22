@@ -67,8 +67,7 @@ var deletePost = function (req, res) { return __awaiter(void 0, void 0, void 0, 
                 return [3 /*break*/, 4];
             case 3:
                 error_1 = _a.sent();
-                res.json(error_1);
-                return [3 /*break*/, 4];
+                return [2 /*return*/, res.status(404).json({ message: error_1 })];
             case 4: return [2 /*return*/];
         }
     });

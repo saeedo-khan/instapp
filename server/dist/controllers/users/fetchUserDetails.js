@@ -93,7 +93,7 @@ var fetchUserDetails = function (req, res) { return __awaiter(void 0, void 0, vo
                     })];
             case 2:
                 error_1 = _a.sent();
-                return [2 /*return*/, res.status(404).json({ error: error_1 })];
+                return [2 /*return*/, res.status(404).json({ message: error_1 })];
             case 3: return [2 /*return*/];
         }
     });

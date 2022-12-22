@@ -72,6 +72,6 @@ export const fetchPostDetails = async (req: Request, res:Response, next:NextFunc
         })
 
     } catch (error) {
-        next(error);
+        return res.status(404).json({ message: error })
     }
 }

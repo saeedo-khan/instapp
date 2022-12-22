@@ -39,6 +39,6 @@ export const changePassword = async (req: Request, res: Response) => {
           });
 
     } catch (error) {
-        return res.status(400).json(error)
+        return res.status(404).json({ message: error })
     }
 }

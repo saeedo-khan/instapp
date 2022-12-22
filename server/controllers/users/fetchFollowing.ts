@@ -25,19 +25,9 @@ export const fetchFollowings = async (req: Request, res: Response) => {
             },
           });
     } catch (error) {
-        return res.status(400).json(error);
+        return res.status(404).json({ message: error })
     }
 };
 
 
 
-// id: true,
-// name: true,
-// profile_pic_url: true,
-// biography: true,
-// gender: true,
-// _count: {
-//     select: {
-//         following: true,
-//     }
-// }

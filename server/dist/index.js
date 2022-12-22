@@ -49,7 +49,6 @@ var cloudinary = require('cloudinary').v2;
 // routes
 var routes_1 = require("./routes");
 var deletePostImage_1 = require("./controllers/posts/deletePostImage");
-var user_automation_1 = require("./controllers/automation/user.automation");
 var corsConfig = {
     origin: true,
     credentials: true
@@ -88,7 +87,6 @@ app.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, func
         return [2 /*return*/];
     });
 }); });
-(0, user_automation_1.createUsers)(10);
 var port = process.env.PORT || 3000;
 app.listen(port, function () {
     console.log("server listening on ".concat(port));

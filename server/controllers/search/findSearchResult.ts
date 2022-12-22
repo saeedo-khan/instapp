@@ -37,6 +37,6 @@ export const findSearchResult = async (req: Request, res: Response, next:NextFun
             }
         })
     } catch (error) {
-        next(error)
+        return res.status(404).json({ message: error })
     }
 }

@@ -66,7 +66,7 @@ var uploadProfilePic = function (req, res) { return __awaiter(void 0, void 0, vo
                 return [3 /*break*/, 3];
             case 2:
                 error_1 = _b.sent();
-                return [2 /*return*/, res.status(400).json(error_1)];
+                return [2 /*return*/, res.status(404).json({ message: error_1 })];
             case 3: return [2 /*return*/];
         }
     });

@@ -80,7 +80,7 @@ var changePassword = function (req, res) { return __awaiter(void 0, void 0, void
                     })];
             case 4:
                 error_1 = _b.sent();
-                return [2 /*return*/, res.status(400).json(error_1)];
+                return [2 /*return*/, res.status(404).json({ message: error_1 })];
             case 5: return [2 /*return*/];
         }
     });

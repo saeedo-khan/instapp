@@ -9,6 +9,6 @@ export const deletePostFile = async (req: Request, res: Response, next:NextFunct
 
         res.send({ ...deleteImageResponse})
     } catch (error) {
-        next(error)
+        return res.status(404).json({ message: error })
     }
 }

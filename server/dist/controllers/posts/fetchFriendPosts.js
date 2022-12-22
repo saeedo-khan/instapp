@@ -138,7 +138,7 @@ var fetchFriendsPost = function (req, res) { return __awaiter(void 0, void 0, vo
                 })];
             case 15:
                 error_1 = _b.sent();
-                return [2 /*return*/, res.status(404).json(error_1)];
+                return [2 /*return*/, res.status(404).json({ message: error_1 })];
             case 16: return [2 /*return*/];
         }
     });

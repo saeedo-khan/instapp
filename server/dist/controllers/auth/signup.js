@@ -98,8 +98,7 @@ var signUp = function (req, res) { return __awaiter(void 0, void 0, void 0, func
                 return [3 /*break*/, 5];
             case 4:
                 error_1 = _f.sent();
-                res.status(404).json({ message: error_1 });
-                return [3 /*break*/, 5];
+                return [2 /*return*/, res.status(404).json({ message: error_1 })];
             case 5: return [2 /*return*/];
         }
     });

@@ -109,8 +109,7 @@ var addRemoveFollow = function (req, res, next) { return __awaiter(void 0, void 
             case 7: return [3 /*break*/, 9];
             case 8:
                 error_1 = _a.sent();
-                next(error_1);
-                return [3 /*break*/, 9];
+                return [2 /*return*/, res.status(404).json({ message: error_1 })];
             case 9: return [2 /*return*/];
         }
     });

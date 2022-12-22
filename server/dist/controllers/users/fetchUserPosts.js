@@ -67,7 +67,7 @@ var fetchUserPosts = function (req, res) { return __awaiter(void 0, void 0, void
                     })];
             case 3:
                 error_1 = _a.sent();
-                return [2 /*return*/, res.status(404).json({ error: error_1 })];
+                return [2 /*return*/, res.status(404).json({ message: error_1 })];
             case 4: return [2 /*return*/];
         }
     });

@@ -23,7 +23,7 @@ export const deletePost = async (req:Request, res:Response) => {
             data: null
         })
     } catch (error) {
-        res.json(error)
+        return res.status(404).json({ message: error })
     }
     
 }

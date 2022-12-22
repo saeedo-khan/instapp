@@ -67,20 +67,10 @@ var fetchFollowings = function (req, res) { return __awaiter(void 0, void 0, voi
                     })];
             case 2:
                 error_1 = _a.sent();
-                return [2 /*return*/, res.status(400).json(error_1)];
+                return [2 /*return*/, res.status(404).json({ message: error_1 })];
             case 3: return [2 /*return*/];
         }
     });
 }); };
 exports.fetchFollowings = fetchFollowings;
-// id: true,
-// name: true,
-// profile_pic_url: true,
-// biography: true,
-// gender: true,
-// _count: {
-//     select: {
-//         following: true,
-//     }
-// }
 //# sourceMappingURL=fetchFollowing.js.map

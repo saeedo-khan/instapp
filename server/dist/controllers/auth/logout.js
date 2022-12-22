@@ -37,12 +37,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.logOut = void 0;
-var logOut = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var logOut = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        return [2 /*return*/, res
-                .clearCookie('accessToken', { sameSite: 'none' })
-                .status(200)
-                .json({ message: 'user has been loged out !! 😢' })];
+        try {
+            return [2 /*return*/, res
+                    .clearCookie('accessToken', { sameSite: 'none' })
+                    .status(200)
+                    .json({ message: 'user has been loged out !! 😢' })];
+        }
+        catch (error) {
+            return [2 /*return*/, res.status(404).json({ message: error })];
+        }
+        return [2 /*return*/];
     });
 }); };
 exports.logOut = logOut;

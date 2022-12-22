@@ -21,6 +21,6 @@ export const fetchAllUsers = async (req:Request, res:Response) => {
             },
           });
     } catch (error) {
-        return res.status(404).json({ error });
+        return res.status(404).json({ message: error })
     }
 }
