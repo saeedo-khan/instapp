@@ -20,7 +20,7 @@ const corsConfig = {
 const app = express()
 
 app.use(express.json())
-app.use(cors(corsConfig))
+app.use(cors())
 app.use(express.static('upload'))
 app.use(cookieParser())
 
