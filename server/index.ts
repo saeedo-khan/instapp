@@ -20,7 +20,10 @@ const corsConfig = {
 const app = express()
 
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+    credentials: true,
+    optionsSuccessStatus: 200
+}))
 app.use(express.static('upload'))
 app.use(cookieParser())
 
