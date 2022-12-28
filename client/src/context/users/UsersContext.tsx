@@ -45,7 +45,7 @@ export const UsersContextProvider: React.FC<UsersContextProps> = ({
       biography,
     };
     axios
-      .patch(`http://localhost:3000/api/users/details`, userUpdate, {
+      .patch(`https://instapp.onrender.com/api/users/details`, userUpdate, {
         withCredentials: true,
       })
       .then((res) => {
@@ -71,7 +71,7 @@ export const UsersContextProvider: React.FC<UsersContextProps> = ({
   }) => {
     axios
       .patch(
-        `http://localhost:3000/api/users/upload_profile_pic`,
+        `https://instapp.onrender.com/api/users/upload_profile_pic`,
         { profileImage: pic, currentUser: userId },
         {
           withCredentials: true,
@@ -88,16 +88,20 @@ export const UsersContextProvider: React.FC<UsersContextProps> = ({
       currentUser: userData.id,
     };
     axios
-      .patch(`http://localhost:3000/api/users/changePassword`, changePass, {
-        withCredentials: true,
-      })
+      .patch(
+        `https://instapp.onrender.com/api/users/changePassword`,
+        changePass,
+        {
+          withCredentials: true,
+        }
+      )
       .then((res) => console.log(res))
       .catch((err) => console.error(err));
   };
 
   const deleteUser = () => {
     axios
-      .delete(`http://localhost:3000/api/users/${userData.id}`, {
+      .delete(`https://instapp.onrender.com/api/users/${userData.id}`, {
         withCredentials: true,
       })
       .then((res) => console.log(res))
@@ -107,7 +111,7 @@ export const UsersContextProvider: React.FC<UsersContextProps> = ({
   const addRmoveFollow = (followerId: string | undefined) => {
     axios
       .patch(
-        `http://localhost:3000/api/users/${followerId}/add_remove_follow`,
+        `https://instapp.onrender.com/api/users/${followerId}/add_remove_follow`,
         {
           userId: userData.id,
         }

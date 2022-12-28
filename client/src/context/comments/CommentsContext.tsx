@@ -26,7 +26,7 @@ export const CommentsProvider: React.FC<CommentsContextProps> = ({
       userId: userData.id,
     };
     axios
-      .post(`http://localhost:3000/api/comments/${postId}`, commentData)
+      .post(`https://instapp.onrender.com/api/comments/${postId}`, commentData)
       .then((res) => console.log(res))
       .catch((err) => {
         console.log(err);
@@ -35,7 +35,7 @@ export const CommentsProvider: React.FC<CommentsContextProps> = ({
 
   const deleteComment = (commentId: string) => {
     axios
-      .delete(`http://localhost:3000/api/comments/${commentId}`, {
+      .delete(`https://instapp.onrender.com/api/comments/${commentId}`, {
         withCredentials: true,
       })
       .then((res) => console.log(res))
@@ -43,7 +43,7 @@ export const CommentsProvider: React.FC<CommentsContextProps> = ({
   };
 
   const fetchComment = (postId: string) => {
-    axios.get(`http://localhost:3000/api/comments/${postId}`);
+    axios.get(`https://instapp.onrender.com/api/comments/${postId}`);
   };
 
   return (

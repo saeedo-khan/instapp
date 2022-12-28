@@ -44,9 +44,13 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
 
     try {
       axios
-        .post<ILogin>("http://localhost:3000/api/auth/login", loginData, {
-          withCredentials: true,
-        })
+        .post<ILogin>(
+          `https://instapp.onrender.com/api/auth/login`,
+          loginData,
+          {
+            withCredentials: true,
+          }
+        )
         .then((res) => {
           const { name, id, email } = res.data.data.existingUser;
           console.log(res);
@@ -73,7 +77,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
       password,
     };
     axios
-      .post("http://localhost:3000/api/auth/signup", signupData, {
+      .post("https://instapp.onrender.com/api/auth/signup", signupData, {
         withCredentials: true,
       })
       .then((res) => {
@@ -84,7 +88,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
 
   const logOut = () => {
     axios
-      .get("http://localhost:3000/api/auth/logout", {
+      .get("https://instapp.onrender.com/api/auth/logout", {
         withCredentials: true,
       })
       .then((res) => {

@@ -182,7 +182,7 @@ const Profile: React.FC<profileProps> = () => {
   const router = useRouter();
 
   const { data, error } = useSWR<Post, any[]>(
-    `http://localhost:3000/api/users/${router.query.username}`,
+    `https://instapp.onrender.com/api/users/${router.query.username}`,
     fetcher
   );
 
@@ -202,11 +202,6 @@ const Profile: React.FC<profileProps> = () => {
     e.preventDefault();
     addRmoveFollow(data?.data.user.id);
   };
-
-  // const getPublic = data?.data.posts.find(
-  //   (post) => post.audience == PostAudienceEnum.PUBLIC
-  // );
-  // console.log("pub", getPublic);
 
   if (error) return <div>failed to load</div>;
   if (!data) return <div>loading...</div>;

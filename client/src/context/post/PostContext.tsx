@@ -40,7 +40,7 @@ export const PostContextProvider: React.FC<PostContextProps> = ({
       email: userData.email,
     };
     axios
-      .post("http://localhost:3000/api/posts", postData, {
+      .post("https://instapp.onrender.com/api/posts", postData, {
         withCredentials: true,
       })
       .then((res) => {
@@ -53,7 +53,7 @@ export const PostContextProvider: React.FC<PostContextProps> = ({
 
   const removePost = (id: String) => {
     axios
-      .delete(`http://localhost:3000/api/posts/${id}`)
+      .delete(`https://instapp.onrender.com/api/posts/${id}`)
       .then((res) => {
         router.push(`/user/${userData.name}`);
       })
@@ -67,7 +67,7 @@ export const PostContextProvider: React.FC<PostContextProps> = ({
     };
     axios
       .patch<IAddRemoveLike>(
-        `http://localhost:3000/api/posts/${postId}/add_remove_like`,
+        `https://instapp.onrender.com/api/posts/${postId}/add_remove_like`,
         like,
         {
           withCredentials: true,
@@ -81,7 +81,7 @@ export const PostContextProvider: React.FC<PostContextProps> = ({
 
   const addTagUser = (tagData: ITag) => {
     axios
-      .post(`http://localhost:3000/api/posts/add_tag`, tagData, {
+      .post(`https://instapp.onrender.com/api/posts/add_tag`, tagData, {
         withCredentials: true,
       })
       .then((res) => console.log(res))

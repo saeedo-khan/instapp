@@ -29,7 +29,7 @@ const PostId: React.FC = () => {
   const router = useRouter();
   const { postId } = router.query;
 
-  const baseUrl = "http://localhost:3000/api/posts/" + postId;
+  const baseUrl = "https://instapp.onrender.com/api/posts/" + postId;
 
   const { data, error } = useSWR<IPostDetails, any>(baseUrl, fetcher);
 

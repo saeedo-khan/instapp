@@ -78,7 +78,7 @@ const Settings = () => {
     setLoading(true);
     const formData = new FormData();
     formData.append("post", fileList[0]);
-    fetch("http://localhost:3000/upload_files", {
+    fetch("https://instapp.onrender.com/upload_files", {
       method: "POST",
       body: formData,
     })
@@ -99,7 +99,7 @@ const Settings = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/api/users/${router.query.username}`)
+      .get(`https://instapp.onrender.com/api/users/${router.query.username}`)
       .then((res) => {
         setUsername(res.data.data.user.name);
         setBiography(res.data.data.user.biography);

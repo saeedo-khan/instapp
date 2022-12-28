@@ -43,13 +43,20 @@ exports.hashPassword = exports.checkPassword = void 0;
 var bcryptjs_1 = __importDefault(require("bcryptjs"));
 // check if plain and hashed password same 
 var checkPassword = function (password, passwordHash) { return __awaiter(void 0, void 0, void 0, function () {
-    var matchPassword;
+    var matchPassword, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, bcryptjs_1["default"].compare(password, passwordHash)];
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, bcryptjs_1["default"].compare(password, passwordHash)];
             case 1:
                 matchPassword = _a.sent();
                 return [2 /*return*/, matchPassword];
+            case 2:
+                error_1 = _a.sent();
+                console.error(error_1);
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
 }); };
