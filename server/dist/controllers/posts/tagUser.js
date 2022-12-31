@@ -102,7 +102,7 @@ var tagUser = function (req, res, next) { return __awaiter(void 0, void 0, void 
                 })];
             case 6:
                 error_1 = _b.sent();
-                return [2 /*return*/, res.status(404).json({ message: error_1 })];
+                return [2 /*return*/, next({ status: 404, message: error_1 })];
             case 7: return [2 /*return*/];
         }
     });

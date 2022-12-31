@@ -67,6 +67,6 @@ export const tagUser = async (
       data: null,
     });
   } catch (error) {
-    return res.status(404).json({ message: error })
+    return next({ status: 404, message: error});
   }
 };

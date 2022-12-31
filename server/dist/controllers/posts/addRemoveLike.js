@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.addRemoveLike = void 0;
 var db_1 = require("../../utils/db");
-var addRemoveLike = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var addRemoveLike = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var postId, userId, post, hasLike, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -119,8 +119,7 @@ var addRemoveLike = function (req, res) { return __awaiter(void 0, void 0, void 
             case 6: return [3 /*break*/, 8];
             case 7:
                 error_1 = _a.sent();
-                res.status(404).json(error_1);
-                return [3 /*break*/, 8];
+                return [2 /*return*/, next({ status: 404, message: error_1 })];
             case 8: return [2 /*return*/];
         }
     });

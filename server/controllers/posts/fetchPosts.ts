@@ -46,6 +46,6 @@ export const fetchPosts = async (req: Request, res: Response, next: NextFunction
             }
         })
     } catch (error) {
-        return res.status(404).json({ message: error })
+        return next({ status: 404, message: error});
     }
 }

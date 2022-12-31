@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { db } from "../../utils/db";
 
-export const addRemoveLike = async (req: Request, res: Response) => {
+export const addRemoveLike = async (req: Request, res: Response, next:NextFunction) => {
     try {
         const postId = req.params.postId;
         const userId = req.body.userId;
@@ -80,6 +80,6 @@ export const addRemoveLike = async (req: Request, res: Response) => {
             });
         }
     } catch (error) {
-        res.status(404).json(error)
+        return next({ status: 404, message: error});
     }
 }
