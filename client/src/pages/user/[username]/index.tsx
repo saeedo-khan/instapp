@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Image from "next/image";
 import {
   Box,
@@ -215,6 +215,7 @@ const Profile: React.FC<profileProps> = () => {
             <Box className={classes.profile_img_wrap}>
               <Image
                 src={`${data?.data.user.profile_pic_url}`}
+                alt={data?.data.user.name}
                 layout="responsive"
                 objectFit="cover"
                 objectPosition="center"

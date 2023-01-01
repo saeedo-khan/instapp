@@ -109,6 +109,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
         <Box className={classes.image_wrap}>
           <Image
             src={`${post.media[0].mediaFile}`}
+            alt={post.content}
             layout="fill"
             objectFit="cover"
           />

@@ -98,17 +98,20 @@ const Settings = () => {
   const router = useRouter();
 
   useEffect(() => {
-    axios
-      .get(`https://instapp.onrender.com/api/users/${router.query.username}`)
-      .then((res) => {
-        setUsername(res.data.data.user.name);
-        setBiography(res.data.data.user.biography);
-        setProfilePic(res.data.data.user.profile_pic_url);
-        setGender(res.data.data.user.gender);
-        setEmail(res.data.data.user.email);
-        setUserId(res.data.data.user.id);
-      })
-      .catch((err) => console.log(err));
+    const fetchUserSettings = () => {
+      axios
+        .get(`https://instapp.onrender.com/api/users/${router.query.username}`)
+        .then((res) => {
+          setUsername(res.data.data.user.name);
+          setBiography(res.data.data.user.biography);
+          setProfilePic(res.data.data.user.profile_pic_url);
+          setGender(res.data.data.user.gender);
+          setEmail(res.data.data.user.email);
+          setUserId(res.data.data.user.id);
+        })
+        .catch((err) => console.log(err));
+    };
+    fetchUserSettings();
   }, []);
 
   return (

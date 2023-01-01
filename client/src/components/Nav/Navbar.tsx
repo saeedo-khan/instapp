@@ -157,6 +157,7 @@ const Navbar = () => {
                 <Link href={"/"}>
                   <Image
                     src={instaLogo}
+                    alt="Logo"
                     layout="intrinsic"
                     width={90}
                     height={30}
@@ -187,7 +188,7 @@ const Navbar = () => {
                   }}
                 >
                   {searchingUsers?.map((user) => (
-                    <ListItem>
+                    <ListItem key={user.id}>
                       <Link href={`/user/${user.name}`}>
                         <ListItemButton>
                           <ListItemAvatar>
