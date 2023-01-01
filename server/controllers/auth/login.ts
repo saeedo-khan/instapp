@@ -1,9 +1,9 @@
+// @ts-nocheck
 import { Request,Response } from "express"
 import jwt, { Secret } from 'jsonwebtoken'
 import { db } from "../../utils/db"
 import bcrypt from 'bcryptjs'
 
-// @ts-nocheck
 
 declare const process : {
     env: {

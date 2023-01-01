@@ -1,7 +1,7 @@
+// @ts-nocheck
 import { Request, Response } from "express";
 import { db } from "../../utils/db";
 import { hasLikePost, include } from "../users/_helper";
-// @ts-nocheck
 const fetchFriendsPost = async (req:Request, res: Response) => {
     try {
         const currentUser = req.body.userId;

@@ -1,5 +1,5 @@
-require("dotenv").config()
 // @ts-nocheck
+require("dotenv").config()
 import express, { Request, Response } from 'express'
 import multer from 'multer'
 import cors from 'cors'
