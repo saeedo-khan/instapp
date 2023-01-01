@@ -1,10 +1,9 @@
 import React from "react";
-import type { GetStaticProps, NextPage } from "next";
+import type { NextPage } from "next";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Post from "../components/posts/Post";
-import axios from "axios";
 import { IPost } from "../interfaces/types";
-import useSWR, { SWRConfig } from "swr";
+import useSWR from "swr";
 import WithAuth from "../HOCs/WithAuth";
 import Sidebar from "../components/sidebar/Sidebar";
 

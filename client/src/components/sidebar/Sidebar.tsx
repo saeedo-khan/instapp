@@ -7,17 +7,13 @@ import {
   ListItemText,
   Typography,
   IconButton,
-  Box,
 } from "@mui/material";
 import Link from "next/link";
 import React from "react";
 import useSWR from "swr";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
-import { RiUserFill } from "react-icons/ri";
 import { TiUserAdd } from "react-icons/ti";
-import WithAuth from "../../HOCs/WithAuth";
 import useUsers from "../../context/users/UsersContext";
-import { useTheme } from "next-themes";
 
 interface suggestionProps {
   type: string;
