@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { NextFunction, Request, Response } from "express";
 import { db } from "../../utils/db";
 
@@ -72,6 +74,6 @@ export const fetchPostDetails = async (req: Request, res:Response, next:NextFunc
         })
 
     } catch (error) {
-        return res.status(404).json({ message: error })
+        return next({ status: 404, message: error});
     }
 }
