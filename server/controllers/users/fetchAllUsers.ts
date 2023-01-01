@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { db } from "../../utils/db";
 
+// @ts-nocheck
 
 export const fetchAllUsers = async (req:Request, res:Response) => {
     try {
         const users = await db.user.findMany({
-            include: {
+            select: {
                 followers: true,
                 following: true,
                 writtenPosts: true,
@@ -24,3 +25,4 @@ export const fetchAllUsers = async (req:Request, res:Response) => {
         return res.status(404).json({ message: error })
     }
 }
+

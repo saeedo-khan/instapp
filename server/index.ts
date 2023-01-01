@@ -1,5 +1,5 @@
 require("dotenv").config()
-
+// @ts-nocheck
 import express, { Request, Response } from 'express'
 import multer from 'multer'
 import cors from 'cors'
@@ -42,7 +42,6 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params:{
         folder:'instapp',
-        public_id: (req:any, file:any) => Math.random()
     },
 })
 

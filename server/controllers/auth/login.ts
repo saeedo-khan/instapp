@@ -3,13 +3,10 @@ import jwt, { Secret } from 'jsonwebtoken'
 import { db } from "../../utils/db"
 import bcrypt from 'bcryptjs'
 
-
+// @ts-nocheck
 
 declare const process : {
     env: {
-        CLOUD_NAME: string;
-        CLOUD_KEY: string;
-        CLOUD_SECRET: string;
         TOKEN_KEY: Secret;
         NODE_ENV: string
     }

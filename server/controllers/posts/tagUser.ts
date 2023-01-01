@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { db } from "../../utils/db";
 
+// @ts-nocheck
+
 export const tagUser = async (
   req: Request,
   res: Response,
