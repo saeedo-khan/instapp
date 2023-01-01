@@ -10,20 +10,12 @@ const cloudinary = require('cloudinary').v2;
 // routes
 import { registerRoutes } from "./routes"
 import { deletePostFile } from './controllers/posts/deletePostImage'
-import { createUsers } from './controllers/automation/user.automation'
 
-const corsConfig = {
-    origin: true,
-    credentials: true,
-};
 
 const app = express()
-
 app.use(express.json())
-app.use(cors({
-    credentials: true,
-    optionsSuccessStatus: 200
-}))
+app.options('*', cors())
+app.use(express.urlencoded({ extended: true }))
 app.use(express.static('upload'))
 app.use(cookieParser())
 

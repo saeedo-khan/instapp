@@ -49,16 +49,10 @@ var cloudinary = require('cloudinary').v2;
 // routes
 var routes_1 = require("./routes");
 var deletePostImage_1 = require("./controllers/posts/deletePostImage");
-var corsConfig = {
-    origin: true,
-    credentials: true
-};
 var app = (0, express_1["default"])();
 app.use(express_1["default"].json());
-app.use((0, cors_1["default"])({
-    credentials: true,
-    optionsSuccessStatus: 200
-}));
+app.options('*', (0, cors_1["default"])());
+app.use(express_1["default"].urlencoded({ extended: true }));
 app.use(express_1["default"].static('upload'));
 app.use((0, cookie_parser_1["default"])());
 // all routes
