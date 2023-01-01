@@ -17,7 +17,7 @@ const WithAuth = <P extends IAuth>(
     useEffect(() => {
       setIsLoading(true);
       axios
-        .get("http://localhost:3000/api/auth/checkAuth", {
+        .get("https://instapp.onrender.com/api/auth/checkAuth", {
           withCredentials: true,
         })
         .then((response) => {
