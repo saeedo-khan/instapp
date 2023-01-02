@@ -1,9 +1,10 @@
 // @ts-nocheck
 require("dotenv").config()
-import express, { Request, Response } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import multer from 'multer'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
+import bodyParser from 'body-parser'
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 const cloudinary = require('cloudinary').v2;
 
@@ -14,12 +15,19 @@ import { corsMiddleware } from './middleware/cors.middleware'
 
 
 const app = express()
+app.all('/*', (req:Request, res:Response, next:NextFunction) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type");
+    res.header("Access-Control-Allow-Methods", "GET, POST","PUT");
+    next();
+})
 app.use(express.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
 app.options('*', cors())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('upload'))
 app.use(cookieParser())
-app.use(corsMiddleware);
 
 // all routes
 registerRoutes(app)
