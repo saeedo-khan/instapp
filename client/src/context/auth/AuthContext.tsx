@@ -77,7 +77,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
       password,
     };
     axios
-      .post("https://instapp.onrender.com/api/auth/signup", signupData, {
+      .post("https://instapp-two.vercel.app/api/auth/signup", signupData, {
         withCredentials: true,
       })
       .then((res) => {
