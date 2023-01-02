@@ -10,6 +10,7 @@ const cloudinary = require('cloudinary').v2;
 // routes
 import { registerRoutes } from "./routes"
 import { deletePostFile } from './controllers/posts/deletePostImage'
+import { corsMiddleware } from './middleware/cors.middleware'
 
 
 const app = express()
@@ -18,6 +19,7 @@ app.options('*', cors())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('upload'))
 app.use(cookieParser())
+app.use(corsMiddleware);
 
 // all routes
 registerRoutes(app)
