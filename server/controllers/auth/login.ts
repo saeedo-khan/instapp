@@ -3,6 +3,8 @@ import { Request,Response } from "express"
 import jwt, { Secret } from 'jsonwebtoken'
 import { db } from "../../utils/db"
 import bcrypt from 'bcryptjs'
+import { Prisma } from "@prisma/client";
+
 
 
 declare const process : {
@@ -64,6 +66,13 @@ export const login = async (req:Request , res:Response ) => {
         }
 
     } catch (error) {
-        res.status(404).json({ message: error})
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2002") {
+              console.log(
+                "There is a unique constraint violation, a new user cannot be created with this email"
+              );
+            }
+          }
+          throw error;
     }
 }
