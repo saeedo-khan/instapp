@@ -15,15 +15,10 @@ import { corsMiddleware } from './middleware/cors.middleware'
 
 
 const app = express()
-app.all('/*', (req:Request, res:Response, next:NextFunction) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type");
-    res.header("Access-Control-Allow-Methods", "GET, POST","PUT");
-    next();
-})
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(cors())
 app.options('*', cors())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static('upload'))
