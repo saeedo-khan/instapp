@@ -45,7 +45,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
     try {
       axios
         .post<ILogin>(
-          `https://instapp.onrender.com/api/auth/login`,
+          `https://instapp-two.vercel.app/api/auth/login`,
           loginData,
           {
             withCredentials: true,
@@ -88,7 +88,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
 
   const logOut = () => {
     axios
-      .get("https://instapp.onrender.com/api/auth/logout", {
+      .get("https://instapp-two.vercel.app/api/auth/logout", {
         withCredentials: true,
       })
       .then((res) => {

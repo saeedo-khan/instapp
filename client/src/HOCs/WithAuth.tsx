@@ -17,7 +17,7 @@ const WithAuth = <P extends IAuth>(
     useEffect(() => {
       setIsLoading(true);
       axios
-        .get("https://instapp.onrender.com/api/auth/checkAuth", {
+        .get("https://instapp-two.vercel.app/api/auth/checkAuth", {
           withCredentials: true,
         })
         .then((response) => {

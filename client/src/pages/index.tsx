@@ -36,7 +36,7 @@ const getPost = () => {};
 
 const Home: NextPage = () => {
   const { data } = useSWR<IDataPost, any[]>(
-    "https://instapp.onrender.com/api/posts/all_posts",
+    "https://instapp-two.vercel.app/api/posts/all_posts",
     fetcher
   );
 

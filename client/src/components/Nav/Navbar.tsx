@@ -130,7 +130,7 @@ const Navbar = () => {
   useEffect(() => {
     const getSearchingResults = async () => {
       const res = await axios.get(
-        `http://localhost:3000/api/search/?q=${searchQuery}`
+        `https://instapp-two.vercel.app/api/search/?q=${searchQuery}`
       );
 
       setSearchingUsers(res.data.data.users);
