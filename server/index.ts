@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(cors())
 app.options('*', cors())
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true })) //
 app.use(express.static('upload'))
 app.use(cookieParser())
 
