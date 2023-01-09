@@ -71,6 +71,6 @@ export const signUp = async (req:Request, res:Response) => {
         });
 
     } catch (error) {
-        return res.status(404).json({ message: error })
+        res.status(404).send(error)
     }
 }
