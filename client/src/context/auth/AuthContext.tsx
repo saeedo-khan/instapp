@@ -23,6 +23,7 @@ interface IAuth {
   signUp: (name: string, email: string, password: string) => void;
   logOut: () => void;
   loading: boolean;
+  errorMsg: string | undefined;
 }
 
 const AuthContext = createContext({} as IAuth);
@@ -31,8 +32,8 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
   children,
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState();
   const router = useRouter();
-  // const [user, setUser] = useSessionStorage("userData", "");
   const [user, setUser] = useLocalStorage("userData", "");
 
   const login = (email: string, password: string) => {
@@ -65,7 +66,6 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
         });
     } catch (err) {
       setLoading(false);
-      router.reload();
     }
   };
 
@@ -97,12 +97,11 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
       })
       .catch((err) => {
         localStorage.clear();
-        router.replace("/");
       });
   };
 
   return (
-    <AuthContext.Provider value={{ login, signUp, logOut, loading }}>
+    <AuthContext.Provider value={{ login, signUp, logOut, loading, errorMsg }}>
       {children}
     </AuthContext.Provider>
   );

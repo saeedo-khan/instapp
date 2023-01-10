@@ -9,8 +9,6 @@ import { useRouter } from "next/router";
 import { LoginSchema } from "../../../validations/userValidate";
 import useAuth from "../../../context/auth/AuthContext";
 
-interface indexProps {}
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     login: {
@@ -92,7 +90,7 @@ interface LoginVal {
   password: string;
 }
 
-const Login: React.FC<indexProps> = ({}) => {
+const Login: React.FC = ({}) => {
   const classes = useStyles();
   const router = useRouter();
   const initialValues: LoginVal = { email: "", password: "" };

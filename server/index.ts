@@ -9,9 +9,12 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 const cloudinary = require('cloudinary').v2;
 
 // routes
-import { registerRoutes } from "./routes"
 import { deletePostFile } from './controllers/posts/deletePostImage'
-import { corsMiddleware } from './middleware/cors.middleware'
+import authRoutes from '../routes/auth.route';
+import commentRoutes from '../routes/comment.route';
+import postRoutes from '../routes/post.route';
+import userRoutes from '../routes/user.route';
+import searchRoutes from '../routes/search.route';
 
 
 const app = express()
@@ -25,7 +28,12 @@ app.use(express.static('upload'))
 app.use(cookieParser())
 
 // all routes
-registerRoutes(app)
+
+app.use("/api/auth", authRoutes);
+app.use("/api/comments", commentRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/search", searchRoutes);
 
 declare var process : {
     env: {
