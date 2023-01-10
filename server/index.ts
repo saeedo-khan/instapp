@@ -79,6 +79,22 @@ app.get("/", async (req:Request, res:Response) => {
     res.send("app running...")
 })
 
+app.post("/api/test", async (req:Request, res:Response) => {
+    try {
+        const message = req.body.message
+        return res.status(200).json(message)
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2002") {
+              console.log(
+                "There is a unique constraint violation, a new user cannot be created with this email"
+              );
+            }
+          }
+          throw error;
+    }
+})
+
 const port = process.env.PORT || 3000
 
 app.listen(port, () => {
