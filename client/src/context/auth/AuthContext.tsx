@@ -54,7 +54,6 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
         )
         .then((res) => {
           const { name, id, email } = res.data.data.existingUser;
-          console.log(res);
           const userData = {
             id,
             name,
@@ -62,7 +61,6 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
           };
           setUser(userData);
           setLoading(false);
-          router.push("/");
         });
     } catch (err) {
       setLoading(false);
@@ -82,7 +80,9 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
       })
       .then((res) => {
         setLoading(false);
-        router.push("/auth/login");
+      })
+      .catch((err) => {
+        alert("Error: " + err.message);
       });
   };
 
