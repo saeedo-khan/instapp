@@ -76,7 +76,7 @@ export const AuthContextProvider: React.FC<AuthContextProps> = ({
     };
     axios
       .post("https://instapp-two.vercel.app/api/auth/signup", signupData, {
-        withCredentials: true,
+        withCredentials: false,
       })
       .then((res) => {
         setLoading(false);
