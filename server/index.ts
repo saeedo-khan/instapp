@@ -7,7 +7,10 @@ import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 const cloudinary = require('cloudinary').v2;
-
+var corsOptions = {
+    origin: '*',
+    optionsSuccessStatus: 200 
+}
 // routes
 import { deletePostFile } from './controllers/posts/deletePostImage'
 import authRoutes from './routes/auth.route';
@@ -21,8 +24,7 @@ const app = express()
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
-app.use(cors())
-app.options('*', cors())
+app.use(cors(corsOptions))
 app.use(express.urlencoded({ extended: true })) //
 app.use(express.static('upload'))
 app.use(cookieParser())
