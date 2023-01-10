@@ -10,11 +10,11 @@ const cloudinary = require('cloudinary').v2;
 
 // routes
 import { deletePostFile } from './controllers/posts/deletePostImage'
-import authRoutes from '../routes/auth.route';
-import commentRoutes from '../routes/comment.route';
-import postRoutes from '../routes/post.route';
-import userRoutes from '../routes/user.route';
-import searchRoutes from '../routes/search.route';
+import authRoutes from './routes/auth.route';
+import commentRoutes from './routes/comment.route';
+import postRoutes from './routes/post.route';
+import userRoutes from './routes/user.route';
+import searchRoutes from './routes/search.route';
 
 
 const app = express()
